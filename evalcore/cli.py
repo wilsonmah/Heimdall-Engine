@@ -13,7 +13,9 @@ import sys
 from pathlib import Path
 
 from .api import create_server, seed_templates
+from .crm.dispatcher import Dispatcher
 from .pipeline import evaluate
+from .residency import Policy, ResidencyError
 from .store import Store
 from .trace import Trace
 from .validation import validate_template
@@ -51,17 +53,28 @@ def main(argv=None):
         print(json.dumps(out, indent=2, ensure_ascii=False))
         return 1 if failed else 0
 
+    policy = Policy.from_env()
+    try:
+        policy.check_storage()
+    except ResidencyError as e:
+        print(f"refusing to start: {e}", file=sys.stderr)
+        return 2
     store = Store(a.db)
     if Path(a.templates).is_dir():
         seed_templates(store, a.templates)
     key = os.environ.get("EVAL_API_KEY")
-    srv = create_server(store, a.host, a.port, key)
-    print(f"evalcore listening on http://{a.host}:{a.port} (auth {'on' if key else 'OFF - dev only'})",
-          file=sys.stderr)
+    dispatcher = Dispatcher(store, policy)
+    dispatcher.start()
+    srv = create_server(store, a.host, a.port, key, dispatcher=dispatcher, policy=policy,
+                        trust_proxy=os.environ.get("EVAL_TRUST_PROXY") == "1")
+    print(f"evalcore listening on http://{a.host}:{a.port} (auth {'on' if key else 'OFF - dev only'}; "
+          f"residency {policy.residency}, region {policy.region}; CRM dispatcher running)", file=sys.stderr)
     try:
         srv.serve_forever()
     except KeyboardInterrupt:
         pass
+    finally:
+        dispatcher.stop()
     return 0
 
 

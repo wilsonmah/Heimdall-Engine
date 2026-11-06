@@ -6,10 +6,38 @@ All `/v1` endpoints take and return JSON. Headers:
 |---|---|
 | `X-API-Key` | required when the server runs with `EVAL_API_KEY` |
 | `X-Actor` | who is making a change; recorded in the audit log |
-| `Accept-Language` | `en` (default) or `fr`; `?lang=` overrides |
+| `Accept-Language` | `en-CA` (default) or `fr-CA` (`en` / `fr` accepted); `?lang=` overrides |
 
 Errors: `{"error": "...", "details": [...]}` with 400 (bad request), 401,
-404, 405, 409 (wrong state), 413, 422 (validation failed).
+403 (origin), 404, 405, 409 (wrong state), 413, 422 (validation failed), 429 (rate limit).
+
+## Public assessment API (website embeds)
+
+No API key; send the publishable `X-Form-Key` from `POST /v1/forms`. CORS is
+allowed for the form key's origins. Details in [LEADGEN.md](LEADGEN.md).
+
+| Method | Path | |
+|---|---|---|
+| GET | `/public/v1/assessments/{id}` | intro, privacy / sharing / consent text, first question |
+| POST | `/public/v1/assessments/{id}/next` | `{"answers": {...}}` → `{done, question, progress}` |
+| POST | `/public/v1/assessments/{id}/submit` | `{"answers", "lead", "consent", "source"?, "website": ""}` → 201 public payload |
+
+## Lead-gen admin
+
+| Method | Path | |
+|---|---|---|
+| POST / GET | `/v1/forms` | create / list publishable form keys `{"templateId", "allowedOrigins"}` |
+| POST / GET | `/v1/crm/destinations` | `{"name", "kind": "HUBSPOT"\|"WEBHOOK", "region", "config", "allowCrossBorder"?, "templateIds"?}` |
+| POST | `/v1/crm/destinations/{id}/enable` · `/disable` | |
+| GET | `/v1/crm/outbox` | `?status=PENDING\|DELIVERED\|FAILED\|BLOCKED&submissionId=` |
+| POST | `/v1/crm/outbox/{id}/retry` | re-queue a FAILED delivery |
+| GET | `/v1/submissions` | `?templateId=&email=` |
+| GET | `/v1/submissions/{id}` | agency payload, public payload, delivery status |
+| GET | `/v1/admin/residency` | residency policy and schema version |
+
+`POST /v1/templates/{id}/dry-run` with `{"answers": {...}, "lead"?: {...}}`
+on an assessment template returns both payloads plus a `crmPreview` of the
+HubSpot properties, without storing or sending anything.
 
 ## Templates
 
@@ -48,8 +76,8 @@ from the template's `retentionDays`.
 
 | Method | Path | |
 |---|---|---|
-| GET | `/v1/subjects/{entityId}` | everything held about one person (access request) |
-| DELETE | `/v1/subjects/{entityId}` | erase their evaluations; audit keeps only a hash |
+| GET | `/v1/subjects/{entityId}` | everything held about one person (access request); an email also finds lead submissions |
+| DELETE | `/v1/subjects/{entityId}` | erase their evaluations / submissions and queued CRM jobs; audit keeps only a hash |
 | POST | `/v1/admin/purge-expired` | delete evaluations past retention (schedule daily) |
 | GET | `/v1/audit` | template saves, rollbacks, reviews, erasures, purges |
 

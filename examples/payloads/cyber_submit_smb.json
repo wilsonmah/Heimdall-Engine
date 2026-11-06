@@ -1,0 +1,29 @@
+{
+  "answers": {
+    "company_size": 8,
+    "industry": "professional_services",
+    "it_budget": "5k_25k",
+    "has_firewall": false,
+    "mfa_coverage": "admins_only",
+    "patching_cadence": "ad_hoc",
+    "security_training": "onboarding_only",
+    "phishing_simulation": false,
+    "password_manager": true,
+    "backup_frequency": "weekly",
+    "backup_locations": ["same_office"],
+    "restore_tested": "never",
+    "backup_in_canada": false
+  },
+  "lead": {
+    "first_name": "Priya",
+    "last_name": "Sandhu",
+    "corporate_email": "Priya@SandhuCPA.example",
+    "company_name": "Sandhu & Co. CPA",
+    "phone": "+1 416 555 0142",
+    "province": "ON",
+    "job_title": "Managing Partner"
+  },
+  "consent": { "privacyNoticeAcknowledged": true, "marketingOptIn": true },
+  "source": { "pageUrl": "https://northbeam.example/cyber-check", "utm_source": "linkedin", "utm_campaign": "q4-cpa-firms" },
+  "website": ""
+}

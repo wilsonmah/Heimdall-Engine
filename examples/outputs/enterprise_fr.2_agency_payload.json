@@ -1,0 +1,367 @@
+{
+  "event": "assessment.completed",
+  "schemaVersion": "1",
+  "submissionId": "sub_50ce2b4d3eef43fe",
+  "occurredAt": "2026-11-06T06:14:13+00:00",
+  "assessment": {
+    "id": "tmpl_cyber_risk_smb",
+    "name": "3-Minute Cybersecurity Risk Check",
+    "versionNo": 1,
+    "semver": "1.0.0"
+  },
+  "respondentLocale": "fr-CA",
+  "lead": {
+    "first_name": "Étienne",
+    "last_name": "Gagnon",
+    "corporate_email": "egagnon@cliniquesboreal.example",
+    "company_name": "Cliniques Boréal inc.",
+    "province": "QC",
+    "email_domain": "cliniquesboreal.example"
+  },
+  "consent": {
+    "privacyNotice": {
+      "acknowledged": true,
+      "templateVersion": "1.0.0",
+      "locale": "fr-CA",
+      "at": "2026-11-06T06:14:13+00:00"
+    },
+    "marketing": {
+      "granted": false,
+      "type": null,
+      "text": "Oui, Northbeam IT Services Inc. peut m'envoyer par courriel des conseils et des offres en cybersécurité. Je peux me désabonner en tout temps.",
+      "senderName": "Northbeam IT Services Inc.",
+      "at": null,
+      "method": null
+    }
+  },
+  "result": {
+    "score": 73.3,
+    "risk": "MEDIUM",
+    "riskOverride": null,
+    "dimensions": [
+      {
+        "code": "DIM_NETWORK",
+        "name": "Network Security",
+        "weight": 0.35,
+        "score": 86.0,
+        "risk": "LOW",
+        "pointsEarned": 86,
+        "pointsPossible": 100,
+        "pointsDeducted": 14,
+        "deductions": [
+          {
+            "questionId": "firewall_managed",
+            "answer": "in_house",
+            "pointsDeducted": 8,
+            "reason": "answer",
+            "impactOnDimension": 8.0,
+            "question": "Who manages and monitors the firewall?",
+            "answerLabel": "Our own staff"
+          },
+          {
+            "questionId": "patching_cadence",
+            "answer": "monthly",
+            "pointsDeducted": 6,
+            "reason": "answer",
+            "impactOnDimension": 6.0,
+            "question": "How are computers and servers kept up to date?",
+            "answerLabel": "Manually, about monthly"
+          }
+        ]
+      },
+      {
+        "code": "DIM_AWARENESS",
+        "name": "Employee Awareness",
+        "weight": 0.2,
+        "score": 85.0,
+        "risk": "LOW",
+        "pointsEarned": 85,
+        "pointsPossible": 100,
+        "pointsDeducted": 15,
+        "deductions": [
+          {
+            "questionId": "security_training",
+            "answer": "annually",
+            "pointsDeducted": 15,
+            "reason": "answer",
+            "impactOnDimension": 15.0,
+            "question": "How often do employees receive security awareness training?",
+            "answerLabel": "Once a year"
+          }
+        ]
+      },
+      {
+        "code": "DIM_BACKUP",
+        "name": "Backup Redundancy",
+        "weight": 0.3,
+        "score": 80.0,
+        "risk": "LOW",
+        "pointsEarned": 80,
+        "pointsPossible": 100,
+        "pointsDeducted": 20,
+        "deductions": [
+          {
+            "questionId": "backup_frequency",
+            "answer": "daily",
+            "pointsDeducted": 5,
+            "reason": "answer",
+            "impactOnDimension": 5.0,
+            "question": "How often is your business data backed up?",
+            "answerLabel": "Daily"
+          },
+          {
+            "questionId": "restore_tested",
+            "answer": "last_year",
+            "pointsDeducted": 15,
+            "reason": "answer",
+            "impactOnDimension": 15.0,
+            "question": "When did you last test restoring from backup?",
+            "answerLabel": "In the last year"
+          }
+        ]
+      },
+      {
+        "code": "DIM_GOVERNANCE",
+        "name": "Governance & Compliance",
+        "weight": 0.15,
+        "score": 15.0,
+        "risk": "HIGH",
+        "pointsEarned": 15,
+        "pointsPossible": 100,
+        "pointsDeducted": 85,
+        "deductions": [
+          {
+            "questionId": "incident_response_plan",
+            "answer": false,
+            "pointsDeducted": 40,
+            "reason": "answer",
+            "impactOnDimension": 40.0,
+            "question": "Do you have a written incident response plan?",
+            "answerLabel": "No"
+          },
+          {
+            "questionId": "cyber_insurance",
+            "answer": "applying",
+            "pointsDeducted": 15,
+            "reason": "answer",
+            "impactOnDimension": 15.0,
+            "question": "Do you have cyber insurance?",
+            "answerLabel": "Applying / renewing"
+          },
+          {
+            "questionId": "compliance_frameworks",
+            "answer": [
+              "none"
+            ],
+            "pointsDeducted": 30,
+            "reason": "answer",
+            "impactOnDimension": 30.0,
+            "question": "Which security standards do you follow or report against? (select all)",
+            "answerLabel": [
+              "None yet"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "answers": [
+    {
+      "questionId": "company_size",
+      "dimension": null,
+      "answer": 120,
+      "pointsEarned": 0,
+      "pointsPossible": 0,
+      "question": "How many employees does your company have?",
+      "answerLabel": 120
+    },
+    {
+      "questionId": "industry",
+      "dimension": null,
+      "answer": "healthcare",
+      "pointsEarned": 0,
+      "pointsPossible": 0,
+      "question": "Which industry are you in?",
+      "answerLabel": "Healthcare"
+    },
+    {
+      "questionId": "it_budget",
+      "dimension": null,
+      "answer": "25k_100k",
+      "pointsEarned": 0,
+      "pointsPossible": 0,
+      "question": "Roughly how much do you spend on IT security per year?",
+      "answerLabel": "$25,000 – $100,000"
+    },
+    {
+      "questionId": "has_firewall",
+      "dimension": "DIM_NETWORK",
+      "answer": true,
+      "pointsEarned": 30,
+      "pointsPossible": 30,
+      "question": "Is your office network protected by a business-grade firewall?",
+      "answerLabel": "Yes"
+    },
+    {
+      "questionId": "firewall_managed",
+      "dimension": "DIM_NETWORK",
+      "answer": "in_house",
+      "pointsEarned": 12,
+      "pointsPossible": 20,
+      "question": "Who manages and monitors the firewall?",
+      "answerLabel": "Our own staff"
+    },
+    {
+      "questionId": "mfa_coverage",
+      "dimension": "DIM_NETWORK",
+      "answer": "all",
+      "pointsEarned": 30,
+      "pointsPossible": 30,
+      "question": "Who must use multi-factor authentication (MFA) for email and cloud apps?",
+      "answerLabel": "Everyone"
+    },
+    {
+      "questionId": "patching_cadence",
+      "dimension": "DIM_NETWORK",
+      "answer": "monthly",
+      "pointsEarned": 14,
+      "pointsPossible": 20,
+      "question": "How are computers and servers kept up to date?",
+      "answerLabel": "Manually, about monthly"
+    },
+    {
+      "questionId": "security_training",
+      "dimension": "DIM_AWARENESS",
+      "answer": "annually",
+      "pointsEarned": 25,
+      "pointsPossible": 40,
+      "question": "How often do employees receive security awareness training?",
+      "answerLabel": "Once a year"
+    },
+    {
+      "questionId": "phishing_simulation",
+      "dimension": "DIM_AWARENESS",
+      "answer": true,
+      "pointsEarned": 30,
+      "pointsPossible": 30,
+      "question": "Do you run simulated phishing tests?",
+      "answerLabel": "Yes"
+    },
+    {
+      "questionId": "password_manager",
+      "dimension": "DIM_AWARENESS",
+      "answer": true,
+      "pointsEarned": 30,
+      "pointsPossible": 30,
+      "question": "Does your team use a company password manager?",
+      "answerLabel": "Yes"
+    },
+    {
+      "questionId": "backup_frequency",
+      "dimension": "DIM_BACKUP",
+      "answer": "daily",
+      "pointsEarned": 25,
+      "pointsPossible": 30,
+      "question": "How often is your business data backed up?",
+      "answerLabel": "Daily"
+    },
+    {
+      "questionId": "backup_locations",
+      "dimension": "DIM_BACKUP",
+      "answer": [
+        "cloud",
+        "immutable"
+      ],
+      "pointsEarned": 30,
+      "pointsPossible": 30,
+      "question": "Where are backup copies kept? (select all)",
+      "answerLabel": [
+        "Cloud backup service",
+        "Immutable / ransomware-proof copy"
+      ]
+    },
+    {
+      "questionId": "restore_tested",
+      "dimension": "DIM_BACKUP",
+      "answer": "last_year",
+      "pointsEarned": 15,
+      "pointsPossible": 30,
+      "question": "When did you last test restoring from backup?",
+      "answerLabel": "In the last year"
+    },
+    {
+      "questionId": "backup_in_canada",
+      "dimension": "DIM_BACKUP",
+      "answer": true,
+      "pointsEarned": 10,
+      "pointsPossible": 10,
+      "question": "Are your backups stored in Canada?",
+      "answerLabel": "Yes"
+    },
+    {
+      "questionId": "incident_response_plan",
+      "dimension": "DIM_GOVERNANCE",
+      "answer": false,
+      "pointsEarned": 0,
+      "pointsPossible": 40,
+      "question": "Do you have a written incident response plan?",
+      "answerLabel": "No"
+    },
+    {
+      "questionId": "cyber_insurance",
+      "dimension": "DIM_GOVERNANCE",
+      "answer": "applying",
+      "pointsEarned": 15,
+      "pointsPossible": 30,
+      "question": "Do you have cyber insurance?",
+      "answerLabel": "Applying / renewing"
+    },
+    {
+      "questionId": "compliance_frameworks",
+      "dimension": "DIM_GOVERNANCE",
+      "answer": [
+        "none"
+      ],
+      "pointsEarned": 0,
+      "pointsPossible": 30,
+      "question": "Which security standards do you follow or report against? (select all)",
+      "answerLabel": [
+        "None yet"
+      ]
+    }
+  ],
+  "skippedQuestions": [],
+  "tags": [
+    "enterprise_lead",
+    "regulated_industry"
+  ],
+  "salesHooks": [
+    {
+      "id": "self_managed_firewall",
+      "priority": 3,
+      "service": "co_managed_soc",
+      "text": "Firewall is self-managed or unmonitored; pitch co-managed 24/7 monitoring rather than a replacement."
+    },
+    {
+      "id": "no_ir_plan",
+      "priority": 4,
+      "service": "incident_response",
+      "text": "No incident response plan; offer a tabletop-exercise workshop that also supports their insurance application."
+    },
+    {
+      "id": "insurance_readiness",
+      "priority": 5,
+      "service": "insurance_readiness",
+      "text": "Cyber insurance missing or pending; use the insurer's security questionnaire as the remediation roadmap."
+    },
+    {
+      "id": "regulated_industry",
+      "priority": 5,
+      "service": "compliance_support",
+      "text": "Regulated industry; emphasize Canadian data residency and audit-ready evidence."
+    }
+  ],
+  "source": {
+    "pageUrl": "https://northbeam.example/fr/bilan-cyber"
+  }
+}

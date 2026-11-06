@@ -1,0 +1,30 @@
+{
+  "contact": {
+    "email": "priya@sandhucpa.example",
+    "firstname": "Priya",
+    "lastname": "Sandhu",
+    "company": "Sandhu & Co. CPA",
+    "phone": "+1 416 555 0142",
+    "jobtitle": "Managing Partner",
+    "state": "ON",
+    "cyber_risk_score": 21.7,
+    "cyber_risk_level": "HIGH",
+    "cyber_risk_tags": "smb_lead;critical_vulnerability;backup_gap;hot_lead",
+    "cyber_network_score": 21.2,
+    "cyber_awareness_score": 40.0,
+    "cyber_backup_score": 10.0,
+    "cyber_sales_hooks": "Lead lacks basic perimeter defence; prioritize cross-selling managed firewall services.\nMFA is not enforced for all staff; position a fixed-fee Microsoft 365 / Google Workspace MFA rollout.\nBackups have never been restore-tested; offer a free restore drill as a foot in the door.\nBackups are stored outside Canada or location unknown; pitch Canadian-hosted backup for residency and client trust.\nSecurity awareness gap; bundle phishing simulations with quarterly training.",
+    "cyber_assessment_id": "sub_586ddcc4a8484cd0",
+    "cyber_assessment_date": "2026-11-06",
+    "cyber_assessment_locale": "en-CA",
+    "cyber_casl_consent": "true",
+    "cyber_casl_consent_date": "2026-11-06"
+  },
+  "company": {
+    "name": "Sandhu & Co. CPA",
+    "domain": "sandhucpa.example",
+    "numberofemployees": 8,
+    "cyber_industry": "professional_services"
+  },
+  "noteHtml": "<p><b>3-Minute Cybersecurity Risk Check</b> - score 21.7 / 100, risk HIGH</p><ul><li><b>Network Security</b>: 21.2 (HIGH)</li><li><b>Employee Awareness</b>: 40.0 (HIGH)</li><li><b>Backup Redundancy</b>: 10.0 (HIGH)</li></ul><p><b>Talking points</b></p><ol><li>Lead lacks basic perimeter defence; prioritize cross-selling managed firewall services.</li><li>MFA is not enforced for all staff; position a fixed-fee Microsoft 365 / Google Workspace MFA rollout.</li><li>Backups have never been restore-tested; offer a free restore drill as a foot in the door.</li><li>Backups are stored outside Canada or location unknown; pitch Canadian-hosted backup for residency and client trust.</li><li>Security awareness gap; bundle phishing simulations with quarterly training.</li></ol>"
+}

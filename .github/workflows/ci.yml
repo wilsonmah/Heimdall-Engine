@@ -19,3 +19,5 @@ jobs:
       - name: Validate shipped templates
         shell: bash
         run: for f in templates/*.json; do python -m evalcore validate "$f"; done
+      - name: Lead-gen demo
+        run: python examples/demo_leadgen.py

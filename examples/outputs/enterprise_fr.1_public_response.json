@@ -1,0 +1,61 @@
+{
+  "submissionId": "sub_50ce2b4d3eef43fe",
+  "assessment": {
+    "id": "tmpl_cyber_risk_smb",
+    "name": "Bilan de cybersécurité en 3 minutes"
+  },
+  "locale": "fr-CA",
+  "score": 73,
+  "risk": "MEDIUM",
+  "riskLabel": "Risque modéré",
+  "summary": "Vous avez une bonne base, avec des lacunes précises à combler ce trimestre.",
+  "dimensions": [
+    {
+      "code": "DIM_NETWORK",
+      "name": "Sécurité du réseau",
+      "score": 86,
+      "risk": "LOW",
+      "riskLabel": "Risque faible",
+      "feedback": "Bonne protection du réseau et des comptes. Maintenez une surveillance et des mises à jour régulières."
+    },
+    {
+      "code": "DIM_AWARENESS",
+      "name": "Sensibilisation des employés",
+      "score": 85,
+      "risk": "LOW",
+      "riskLabel": "Risque faible",
+      "feedback": "Une équipe sensibilisée à la sécurité. Poursuivez une formation régulière."
+    },
+    {
+      "code": "DIM_BACKUP",
+      "name": "Redondance des sauvegardes",
+      "score": 80,
+      "risk": "LOW",
+      "riskLabel": "Risque faible",
+      "feedback": "Des sauvegardes résilientes et testées. Bravo."
+    },
+    {
+      "code": "DIM_GOVERNANCE",
+      "name": "Gouvernance et conformité",
+      "score": 15,
+      "risk": "HIGH",
+      "riskLabel": "Risque élevé",
+      "feedback": "Aucun plan documenté en cas d'incident de sécurité et peu de transfert de risque."
+    }
+  ],
+  "chart": {
+    "type": "RADAR_CHART",
+    "labels": [
+      "Sécurité du réseau",
+      "Sensibilisation des employés",
+      "Redondance des sauvegardes",
+      "Gouvernance et conformité"
+    ],
+    "values": [
+      86,
+      85,
+      80,
+      15
+    ]
+  }
+}

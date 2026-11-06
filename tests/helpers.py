@@ -19,3 +19,7 @@ def vendor():
 
 def payload(name):
     return copy.deepcopy(load(f"examples/payloads/{name}.json"))
+
+
+def cyber():
+    return copy.deepcopy(load("templates/tmpl_cyber_risk_smb.json"))

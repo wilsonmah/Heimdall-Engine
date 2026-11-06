@@ -1,0 +1,28 @@
+{
+  "contact": {
+    "email": "egagnon@cliniquesboreal.example",
+    "firstname": "Étienne",
+    "lastname": "Gagnon",
+    "company": "Cliniques Boréal inc.",
+    "state": "QC",
+    "cyber_risk_score": 73.3,
+    "cyber_risk_level": "MEDIUM",
+    "cyber_risk_tags": "enterprise_lead;regulated_industry",
+    "cyber_network_score": 86.0,
+    "cyber_awareness_score": 85.0,
+    "cyber_backup_score": 80.0,
+    "cyber_governance_score": 15.0,
+    "cyber_sales_hooks": "Firewall is self-managed or unmonitored; pitch co-managed 24/7 monitoring rather than a replacement.\nNo incident response plan; offer a tabletop-exercise workshop that also supports their insurance application.\nCyber insurance missing or pending; use the insurer's security questionnaire as the remediation roadmap.\nRegulated industry; emphasize Canadian data residency and audit-ready evidence.",
+    "cyber_assessment_id": "sub_50ce2b4d3eef43fe",
+    "cyber_assessment_date": "2026-11-06",
+    "cyber_assessment_locale": "fr-CA",
+    "cyber_casl_consent": "false"
+  },
+  "company": {
+    "name": "Cliniques Boréal inc.",
+    "domain": "cliniquesboreal.example",
+    "numberofemployees": 120,
+    "cyber_industry": "healthcare"
+  },
+  "noteHtml": "<p><b>3-Minute Cybersecurity Risk Check</b> - score 73.3 / 100, risk MEDIUM</p><ul><li><b>Network Security</b>: 86.0 (LOW)</li><li><b>Employee Awareness</b>: 85.0 (LOW)</li><li><b>Backup Redundancy</b>: 80.0 (LOW)</li><li><b>Governance &amp; Compliance</b>: 15.0 (HIGH)</li></ul><p><b>Talking points</b></p><ol><li>Firewall is self-managed or unmonitored; pitch co-managed 24/7 monitoring rather than a replacement.</li><li>No incident response plan; offer a tabletop-exercise workshop that also supports their insurance application.</li><li>Cyber insurance missing or pending; use the insurer&#x27;s security questionnaire as the remediation roadmap.</li><li>Regulated industry; emphasize Canadian data residency and audit-ready evidence.</li></ol>"
+}

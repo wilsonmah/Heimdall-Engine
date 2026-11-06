@@ -1,0 +1,51 @@
+{
+  "submissionId": "sub_586ddcc4a8484cd0",
+  "assessment": {
+    "id": "tmpl_cyber_risk_smb",
+    "name": "3-Minute Cybersecurity Risk Check"
+  },
+  "locale": "en-CA",
+  "score": 22,
+  "risk": "HIGH",
+  "riskLabel": "High risk",
+  "summary": "Your business is highly exposed. A few targeted fixes would sharply reduce the chance of a costly incident.",
+  "dimensions": [
+    {
+      "code": "DIM_NETWORK",
+      "name": "Network Security",
+      "score": 21,
+      "risk": "HIGH",
+      "riskLabel": "High risk",
+      "feedback": "Basic perimeter and account protections are missing. These are the most common entry points for attackers."
+    },
+    {
+      "code": "DIM_AWARENESS",
+      "name": "Employee Awareness",
+      "score": 40,
+      "risk": "HIGH",
+      "riskLabel": "High risk",
+      "feedback": "Staff have little security training. Phishing remains the leading cause of breaches."
+    },
+    {
+      "code": "DIM_BACKUP",
+      "name": "Backup Redundancy",
+      "score": 10,
+      "risk": "HIGH",
+      "riskLabel": "High risk",
+      "feedback": "Your business may not recover from ransomware or hardware failure. Backups are the last line of defence."
+    }
+  ],
+  "chart": {
+    "type": "RADAR_CHART",
+    "labels": [
+      "Network Security",
+      "Employee Awareness",
+      "Backup Redundancy"
+    ],
+    "values": [
+      21,
+      40,
+      10
+    ]
+  }
+}

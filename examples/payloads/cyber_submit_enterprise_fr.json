@@ -1,0 +1,30 @@
+{
+  "answers": {
+    "company_size": 120,
+    "industry": "healthcare",
+    "it_budget": "25k_100k",
+    "has_firewall": true,
+    "firewall_managed": "in_house",
+    "mfa_coverage": "all",
+    "patching_cadence": "monthly",
+    "security_training": "annually",
+    "phishing_simulation": true,
+    "password_manager": true,
+    "backup_frequency": "daily",
+    "backup_locations": ["cloud", "immutable"],
+    "restore_tested": "last_year",
+    "backup_in_canada": true,
+    "incident_response_plan": false,
+    "cyber_insurance": "applying",
+    "compliance_frameworks": ["none"]
+  },
+  "lead": {
+    "first_name": "Étienne",
+    "last_name": "Gagnon",
+    "corporate_email": "egagnon@cliniquesboreal.example",
+    "company_name": "Cliniques Boréal inc.",
+    "province": "QC"
+  },
+  "consent": { "privacyNoticeAcknowledged": true, "marketingOptIn": false },
+  "source": { "pageUrl": "https://northbeam.example/fr/bilan-cyber" }
+}

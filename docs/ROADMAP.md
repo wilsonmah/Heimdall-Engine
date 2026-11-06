@@ -41,8 +41,15 @@ stops mistakes, not attackers.
 
 ## 5. Integrations (headless delivery)
 
-- Outbound webhooks on evaluation completed / review needed, with HMAC
-  signatures and retries.
+- Done for lead-gen: HubSpot adapter and signed webhooks via a transactional
+  outbox with retries. Next: native Salesforce (Composite API, upsert by
+  external id) and Zoho CRM (ca data centre) adapters; HubSpot property
+  bootstrap (create the custom properties from the template's crmMapping);
+  CRM-side erasure when a subject is deleted here.
+- Run the dispatcher as its own process (or a queue such as SQS in
+  ca-central-1) once there is more than one API instance; move the rate
+  limiter to Redis.
+- Outbound webhooks for SCRIPT evaluations (completed / review needed).
 - Connectors: Microsoft Teams and Slack notifications; BambooHR, Workday,
   Dayforce, Humi / Collage for candidates; QuickBooks Online, Sage, NetSuite
   for vendors; Microsoft Forms / Google Forms for manual inputs.

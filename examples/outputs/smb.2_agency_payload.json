@@ -1,0 +1,350 @@
+{
+  "event": "assessment.completed",
+  "schemaVersion": "1",
+  "submissionId": "sub_586ddcc4a8484cd0",
+  "occurredAt": "2026-11-06T06:14:13+00:00",
+  "assessment": {
+    "id": "tmpl_cyber_risk_smb",
+    "name": "3-Minute Cybersecurity Risk Check",
+    "versionNo": 1,
+    "semver": "1.0.0"
+  },
+  "respondentLocale": "en-CA",
+  "lead": {
+    "first_name": "Priya",
+    "last_name": "Sandhu",
+    "corporate_email": "priya@sandhucpa.example",
+    "company_name": "Sandhu & Co. CPA",
+    "phone": "+1 416 555 0142",
+    "province": "ON",
+    "job_title": "Managing Partner",
+    "email_domain": "sandhucpa.example"
+  },
+  "consent": {
+    "privacyNotice": {
+      "acknowledged": true,
+      "templateVersion": "1.0.0",
+      "locale": "en-CA",
+      "at": "2026-11-06T06:14:13+00:00"
+    },
+    "marketing": {
+      "granted": true,
+      "type": "express",
+      "text": "Yes, Northbeam IT Services Inc. may email me cybersecurity tips and offers. I can unsubscribe at any time.",
+      "senderName": "Northbeam IT Services Inc.",
+      "at": "2026-11-06T06:14:13+00:00",
+      "method": "web-form-unchecked-checkbox"
+    }
+  },
+  "result": {
+    "score": 21.7,
+    "risk": "HIGH",
+    "riskOverride": null,
+    "dimensions": [
+      {
+        "code": "DIM_NETWORK",
+        "name": "Network Security",
+        "weight": 0.35,
+        "score": 21.2,
+        "risk": "HIGH",
+        "pointsEarned": 17,
+        "pointsPossible": 80,
+        "pointsDeducted": 63,
+        "deductions": [
+          {
+            "questionId": "has_firewall",
+            "answer": false,
+            "pointsDeducted": 30,
+            "reason": "answer",
+            "impactOnDimension": 37.5,
+            "question": "Is your office network protected by a business-grade firewall?",
+            "answerLabel": "No / not sure"
+          },
+          {
+            "questionId": "mfa_coverage",
+            "answer": "admins_only",
+            "pointsDeducted": 18,
+            "reason": "answer",
+            "impactOnDimension": 22.5,
+            "question": "Who must use multi-factor authentication (MFA) for email and cloud apps?",
+            "answerLabel": "Only administrators"
+          },
+          {
+            "questionId": "patching_cadence",
+            "answer": "ad_hoc",
+            "pointsDeducted": 15,
+            "reason": "answer",
+            "impactOnDimension": 18.8,
+            "question": "How are computers and servers kept up to date?",
+            "answerLabel": "When someone remembers"
+          }
+        ]
+      },
+      {
+        "code": "DIM_AWARENESS",
+        "name": "Employee Awareness",
+        "weight": 0.2,
+        "score": 40.0,
+        "risk": "HIGH",
+        "pointsEarned": 40,
+        "pointsPossible": 100,
+        "pointsDeducted": 60,
+        "deductions": [
+          {
+            "questionId": "security_training",
+            "answer": "onboarding_only",
+            "pointsDeducted": 30,
+            "reason": "answer",
+            "impactOnDimension": 30.0,
+            "question": "How often do employees receive security awareness training?",
+            "answerLabel": "Only when they join"
+          },
+          {
+            "questionId": "phishing_simulation",
+            "answer": false,
+            "pointsDeducted": 30,
+            "reason": "answer",
+            "impactOnDimension": 30.0,
+            "question": "Do you run simulated phishing tests?",
+            "answerLabel": "No"
+          }
+        ]
+      },
+      {
+        "code": "DIM_BACKUP",
+        "name": "Backup Redundancy",
+        "weight": 0.3,
+        "score": 10.0,
+        "risk": "HIGH",
+        "pointsEarned": 10,
+        "pointsPossible": 100,
+        "pointsDeducted": 90,
+        "deductions": [
+          {
+            "questionId": "backup_frequency",
+            "answer": "weekly",
+            "pointsDeducted": 20,
+            "reason": "answer",
+            "impactOnDimension": 20.0,
+            "question": "How often is your business data backed up?",
+            "answerLabel": "Weekly or less"
+          },
+          {
+            "questionId": "backup_locations",
+            "answer": [
+              "same_office"
+            ],
+            "pointsDeducted": 30,
+            "reason": "answer",
+            "impactOnDimension": 30.0,
+            "question": "Where are backup copies kept? (select all)",
+            "answerLabel": [
+              "Only in the same office"
+            ]
+          },
+          {
+            "questionId": "restore_tested",
+            "answer": "never",
+            "pointsDeducted": 30,
+            "reason": "answer",
+            "impactOnDimension": 30.0,
+            "question": "When did you last test restoring from backup?",
+            "answerLabel": "Never / not sure"
+          },
+          {
+            "questionId": "backup_in_canada",
+            "answer": false,
+            "pointsDeducted": 10,
+            "reason": "answer",
+            "impactOnDimension": 10.0,
+            "question": "Are your backups stored in Canada?",
+            "answerLabel": "No / not sure"
+          }
+        ]
+      },
+      {
+        "code": "DIM_GOVERNANCE",
+        "name": "Governance & Compliance",
+        "weight": 0.15,
+        "score": null,
+        "risk": null,
+        "pointsEarned": 0,
+        "pointsPossible": 0,
+        "pointsDeducted": 0,
+        "deductions": []
+      }
+    ]
+  },
+  "answers": [
+    {
+      "questionId": "company_size",
+      "dimension": null,
+      "answer": 8,
+      "pointsEarned": 0,
+      "pointsPossible": 0,
+      "question": "How many employees does your company have?",
+      "answerLabel": 8
+    },
+    {
+      "questionId": "industry",
+      "dimension": null,
+      "answer": "professional_services",
+      "pointsEarned": 0,
+      "pointsPossible": 0,
+      "question": "Which industry are you in?",
+      "answerLabel": "Professional services"
+    },
+    {
+      "questionId": "it_budget",
+      "dimension": null,
+      "answer": "5k_25k",
+      "pointsEarned": 0,
+      "pointsPossible": 0,
+      "question": "Roughly how much do you spend on IT security per year?",
+      "answerLabel": "$5,000 – $25,000"
+    },
+    {
+      "questionId": "has_firewall",
+      "dimension": "DIM_NETWORK",
+      "answer": false,
+      "pointsEarned": 0,
+      "pointsPossible": 30,
+      "question": "Is your office network protected by a business-grade firewall?",
+      "answerLabel": "No / not sure"
+    },
+    {
+      "questionId": "mfa_coverage",
+      "dimension": "DIM_NETWORK",
+      "answer": "admins_only",
+      "pointsEarned": 12,
+      "pointsPossible": 30,
+      "question": "Who must use multi-factor authentication (MFA) for email and cloud apps?",
+      "answerLabel": "Only administrators"
+    },
+    {
+      "questionId": "patching_cadence",
+      "dimension": "DIM_NETWORK",
+      "answer": "ad_hoc",
+      "pointsEarned": 5,
+      "pointsPossible": 20,
+      "question": "How are computers and servers kept up to date?",
+      "answerLabel": "When someone remembers"
+    },
+    {
+      "questionId": "security_training",
+      "dimension": "DIM_AWARENESS",
+      "answer": "onboarding_only",
+      "pointsEarned": 10,
+      "pointsPossible": 40,
+      "question": "How often do employees receive security awareness training?",
+      "answerLabel": "Only when they join"
+    },
+    {
+      "questionId": "phishing_simulation",
+      "dimension": "DIM_AWARENESS",
+      "answer": false,
+      "pointsEarned": 0,
+      "pointsPossible": 30,
+      "question": "Do you run simulated phishing tests?",
+      "answerLabel": "No"
+    },
+    {
+      "questionId": "password_manager",
+      "dimension": "DIM_AWARENESS",
+      "answer": true,
+      "pointsEarned": 30,
+      "pointsPossible": 30,
+      "question": "Does your team use a company password manager?",
+      "answerLabel": "Yes"
+    },
+    {
+      "questionId": "backup_frequency",
+      "dimension": "DIM_BACKUP",
+      "answer": "weekly",
+      "pointsEarned": 10,
+      "pointsPossible": 30,
+      "question": "How often is your business data backed up?",
+      "answerLabel": "Weekly or less"
+    },
+    {
+      "questionId": "backup_locations",
+      "dimension": "DIM_BACKUP",
+      "answer": [
+        "same_office"
+      ],
+      "pointsEarned": 0,
+      "pointsPossible": 30,
+      "question": "Where are backup copies kept? (select all)",
+      "answerLabel": [
+        "Only in the same office"
+      ]
+    },
+    {
+      "questionId": "restore_tested",
+      "dimension": "DIM_BACKUP",
+      "answer": "never",
+      "pointsEarned": 0,
+      "pointsPossible": 30,
+      "question": "When did you last test restoring from backup?",
+      "answerLabel": "Never / not sure"
+    },
+    {
+      "questionId": "backup_in_canada",
+      "dimension": "DIM_BACKUP",
+      "answer": false,
+      "pointsEarned": 0,
+      "pointsPossible": 10,
+      "question": "Are your backups stored in Canada?",
+      "answerLabel": "No / not sure"
+    }
+  ],
+  "skippedQuestions": [
+    "firewall_managed",
+    "incident_response_plan",
+    "cyber_insurance",
+    "compliance_frameworks"
+  ],
+  "tags": [
+    "smb_lead",
+    "critical_vulnerability",
+    "backup_gap",
+    "hot_lead"
+  ],
+  "salesHooks": [
+    {
+      "id": "no_firewall",
+      "priority": 1,
+      "service": "managed_firewall",
+      "text": "Lead lacks basic perimeter defence; prioritize cross-selling managed firewall services."
+    },
+    {
+      "id": "mfa_gap",
+      "priority": 2,
+      "service": "identity_security",
+      "text": "MFA is not enforced for all staff; position a fixed-fee Microsoft 365 / Google Workspace MFA rollout."
+    },
+    {
+      "id": "untested_restore",
+      "priority": 2,
+      "service": "backup_as_a_service",
+      "text": "Backups have never been restore-tested; offer a free restore drill as a foot in the door."
+    },
+    {
+      "id": "backups_outside_canada",
+      "priority": 3,
+      "service": "canadian_backup",
+      "text": "Backups are stored outside Canada or location unknown; pitch Canadian-hosted backup for residency and client trust."
+    },
+    {
+      "id": "awareness_gap",
+      "priority": 4,
+      "service": "security_awareness",
+      "text": "Security awareness gap; bundle phishing simulations with quarterly training."
+    }
+  ],
+  "source": {
+    "pageUrl": "https://northbeam.example/cyber-check",
+    "utm_source": "linkedin",
+    "utm_campaign": "q4-cpa-firms"
+  }
+}

@@ -1,0 +1,320 @@
+{
+  "$schema": "../evalcore/schema/evaluation-template.schema.json",
+  "evaluationTemplateId": "tmpl_cyber_risk_smb",
+  "name": { "en-CA": "3-Minute Cybersecurity Risk Check", "fr-CA": "Bilan de cybersécurité en 3 minutes" },
+  "version": "1.0.0",
+  "meta": {
+    "createdBy": "Platform team",
+    "description": "Lead-gen diagnostic for IT managed service providers. Example sender: Northbeam IT Services (fictional)."
+  },
+
+  "targetSchema": {
+    "allowedTypes": ["LEAD"],
+    "identifierMapping": { "primaryKey": "corporate_email" }
+  },
+
+  "evaluationMatrix": {
+    "$comment": "Governance only applies to companies with 10+ staff; weights renormalize when a dimension has no applicable questions.",
+    "dimensions": [
+      {
+        "code": "DIM_NETWORK", "weight": 0.35,
+        "name": { "en-CA": "Network Security", "fr-CA": "Sécurité du réseau" },
+        "feedback": {
+          "HIGH": { "en-CA": "Basic perimeter and account protections are missing. These are the most common entry points for attackers.", "fr-CA": "Des protections de base du périmètre et des comptes sont absentes. Ce sont les points d'entrée les plus fréquents des attaquants." },
+          "MEDIUM": { "en-CA": "Core protections exist but have gaps, often in multi-factor authentication or patching.", "fr-CA": "Les protections de base existent, mais présentent des lacunes, souvent dans l'authentification multifacteur ou les mises à jour." },
+          "LOW": { "en-CA": "Strong network and account protection. Keep monitoring and patching consistent.", "fr-CA": "Bonne protection du réseau et des comptes. Maintenez une surveillance et des mises à jour régulières." }
+        }
+      },
+      {
+        "code": "DIM_AWARENESS", "weight": 0.20,
+        "name": { "en-CA": "Employee Awareness", "fr-CA": "Sensibilisation des employés" },
+        "feedback": {
+          "HIGH": { "en-CA": "Staff have little security training. Phishing remains the leading cause of breaches.", "fr-CA": "Le personnel a peu de formation en sécurité. L'hameçonnage demeure la principale cause d'incidents." },
+          "MEDIUM": { "en-CA": "Some training is in place. Regular phishing practice would make it stick.", "fr-CA": "Une certaine formation est en place. Des exercices d'hameçonnage réguliers la rendraient plus efficace." },
+          "LOW": { "en-CA": "A security-aware team. Keep training regular.", "fr-CA": "Une équipe sensibilisée à la sécurité. Poursuivez une formation régulière." }
+        }
+      },
+      {
+        "code": "DIM_BACKUP", "weight": 0.30,
+        "name": { "en-CA": "Backup Redundancy", "fr-CA": "Redondance des sauvegardes" },
+        "feedback": {
+          "HIGH": { "en-CA": "Your business may not recover from ransomware or hardware failure. Backups are the last line of defence.", "fr-CA": "Votre entreprise pourrait ne pas se remettre d'un rançongiciel ou d'une panne matérielle. Les sauvegardes sont le dernier rempart." },
+          "MEDIUM": { "en-CA": "Backups exist, but off-site copies or restore testing need attention.", "fr-CA": "Des sauvegardes existent, mais les copies hors site ou les tests de restauration doivent être améliorés." },
+          "LOW": { "en-CA": "Resilient, tested backups. Well done.", "fr-CA": "Des sauvegardes résilientes et testées. Bravo." }
+        }
+      },
+      {
+        "code": "DIM_GOVERNANCE", "weight": 0.15,
+        "name": { "en-CA": "Governance & Compliance", "fr-CA": "Gouvernance et conformité" },
+        "feedback": {
+          "HIGH": { "en-CA": "No documented plan for a security incident, and limited risk transfer.", "fr-CA": "Aucun plan documenté en cas d'incident de sécurité et peu de transfert de risque." },
+          "MEDIUM": { "en-CA": "Some governance in place. Formalizing it helps with insurance and client audits.", "fr-CA": "Une certaine gouvernance existe. La formaliser facilite l'assurance et les audits clients." },
+          "LOW": { "en-CA": "Mature governance for a business your size.", "fr-CA": "Une gouvernance mature pour une entreprise de votre taille." }
+        }
+      }
+    ]
+  },
+
+  "assessment": {
+    "locales": ["en-CA", "fr-CA"],
+    "estimatedMinutes": 3,
+    "secondsPerQuestion": 10,
+    "requireCorporateEmail": true,
+    "intro": {
+      "en-CA": "Answer up to 17 quick questions and get an instant risk score for your business.",
+      "fr-CA": "Répondez à au plus 17 questions rapides et obtenez une note de risque instantanée pour votre entreprise."
+    },
+    "questions": [
+      { "id": "company_size", "type": "NUMBER", "min": 1, "max": 100000,
+        "text": { "en-CA": "How many employees does your company have?", "fr-CA": "Combien d'employés compte votre entreprise?" } },
+      { "id": "industry", "type": "SINGLE_CHOICE",
+        "text": { "en-CA": "Which industry are you in?", "fr-CA": "Dans quel secteur êtes-vous?" },
+        "options": [
+          { "value": "professional_services", "label": { "en-CA": "Professional services", "fr-CA": "Services professionnels" } },
+          { "value": "healthcare", "label": { "en-CA": "Healthcare", "fr-CA": "Santé" } },
+          { "value": "finance", "label": { "en-CA": "Finance & insurance", "fr-CA": "Finance et assurance" } },
+          { "value": "retail", "label": { "en-CA": "Retail & e-commerce", "fr-CA": "Commerce de détail et en ligne" } },
+          { "value": "manufacturing", "label": { "en-CA": "Manufacturing", "fr-CA": "Fabrication" } },
+          { "value": "other", "label": { "en-CA": "Other", "fr-CA": "Autre" } }
+        ] },
+      { "id": "it_budget", "type": "SINGLE_CHOICE",
+        "text": { "en-CA": "Roughly how much do you spend on IT security per year?", "fr-CA": "Environ combien dépensez-vous par année en sécurité informatique?" },
+        "options": [
+          { "value": "under_5k", "label": { "en-CA": "Under $5,000", "fr-CA": "Moins de 5 000 $" } },
+          { "value": "5k_25k", "label": { "en-CA": "$5,000 – $25,000", "fr-CA": "5 000 $ – 25 000 $" } },
+          { "value": "25k_100k", "label": { "en-CA": "$25,000 – $100,000", "fr-CA": "25 000 $ – 100 000 $" } },
+          { "value": "over_100k", "label": { "en-CA": "Over $100,000", "fr-CA": "Plus de 100 000 $" } }
+        ] },
+
+      { "id": "has_firewall", "type": "BOOLEAN", "dimension": "DIM_NETWORK",
+        "text": { "en-CA": "Is your office network protected by a business-grade firewall?", "fr-CA": "Votre réseau de bureau est-il protégé par un pare-feu de niveau professionnel?" },
+        "options": [
+          { "value": true, "points": 30, "label": { "en-CA": "Yes", "fr-CA": "Oui" } },
+          { "value": false, "points": 0, "label": { "en-CA": "No / not sure", "fr-CA": "Non / je ne sais pas" } }
+        ] },
+      { "id": "firewall_managed", "type": "SINGLE_CHOICE", "dimension": "DIM_NETWORK",
+        "showIf": { "field": "has_firewall", "op": "eq", "value": true },
+        "text": { "en-CA": "Who manages and monitors the firewall?", "fr-CA": "Qui gère et surveille le pare-feu?" },
+        "options": [
+          { "value": "managed_provider", "points": 20, "label": { "en-CA": "A managed IT provider", "fr-CA": "Un fournisseur de services gérés" } },
+          { "value": "in_house", "points": 12, "label": { "en-CA": "Our own staff", "fr-CA": "Notre propre personnel" } },
+          { "value": "unsure", "points": 0, "label": { "en-CA": "Not sure", "fr-CA": "Je ne sais pas" } }
+        ] },
+      { "id": "mfa_coverage", "type": "SINGLE_CHOICE", "dimension": "DIM_NETWORK",
+        "text": { "en-CA": "Who must use multi-factor authentication (MFA) for email and cloud apps?", "fr-CA": "Qui doit utiliser l'authentification multifacteur (AMF) pour le courriel et les applications infonuagiques?" },
+        "options": [
+          { "value": "all", "points": 30, "label": { "en-CA": "Everyone", "fr-CA": "Tout le monde" } },
+          { "value": "admins_only", "points": 12, "label": { "en-CA": "Only administrators", "fr-CA": "Seulement les administrateurs" } },
+          { "value": "none", "points": 0, "label": { "en-CA": "No one / not sure", "fr-CA": "Personne / je ne sais pas" } }
+        ] },
+      { "id": "patching_cadence", "type": "SINGLE_CHOICE", "dimension": "DIM_NETWORK",
+        "text": { "en-CA": "How are computers and servers kept up to date?", "fr-CA": "Comment les ordinateurs et serveurs sont-ils mis à jour?" },
+        "options": [
+          { "value": "automatic", "points": 20, "label": { "en-CA": "Automatically, centrally managed", "fr-CA": "Automatiquement, gestion centralisée" } },
+          { "value": "monthly", "points": 14, "label": { "en-CA": "Manually, about monthly", "fr-CA": "Manuellement, environ chaque mois" } },
+          { "value": "ad_hoc", "points": 5, "label": { "en-CA": "When someone remembers", "fr-CA": "Quand quelqu'un y pense" } },
+          { "value": "never", "points": 0, "label": { "en-CA": "Rarely or never", "fr-CA": "Rarement ou jamais" } }
+        ] },
+
+      { "id": "security_training", "type": "SINGLE_CHOICE", "dimension": "DIM_AWARENESS",
+        "text": { "en-CA": "How often do employees receive security awareness training?", "fr-CA": "À quelle fréquence les employés reçoivent-ils une formation de sensibilisation à la sécurité?" },
+        "options": [
+          { "value": "quarterly", "points": 40, "label": { "en-CA": "Quarterly or more", "fr-CA": "Chaque trimestre ou plus" } },
+          { "value": "annually", "points": 25, "label": { "en-CA": "Once a year", "fr-CA": "Une fois par année" } },
+          { "value": "onboarding_only", "points": 10, "label": { "en-CA": "Only when they join", "fr-CA": "Seulement à l'embauche" } },
+          { "value": "never", "points": 0, "label": { "en-CA": "Never", "fr-CA": "Jamais" } }
+        ] },
+      { "id": "phishing_simulation", "type": "BOOLEAN", "dimension": "DIM_AWARENESS",
+        "text": { "en-CA": "Do you run simulated phishing tests?", "fr-CA": "Effectuez-vous des simulations d'hameçonnage?" },
+        "options": [
+          { "value": true, "points": 30, "label": { "en-CA": "Yes", "fr-CA": "Oui" } },
+          { "value": false, "points": 0, "label": { "en-CA": "No", "fr-CA": "Non" } }
+        ] },
+      { "id": "password_manager", "type": "BOOLEAN", "dimension": "DIM_AWARENESS",
+        "text": { "en-CA": "Does your team use a company password manager?", "fr-CA": "Votre équipe utilise-t-elle un gestionnaire de mots de passe d'entreprise?" },
+        "options": [
+          { "value": true, "points": 30, "label": { "en-CA": "Yes", "fr-CA": "Oui" } },
+          { "value": false, "points": 0, "label": { "en-CA": "No", "fr-CA": "Non" } }
+        ] },
+
+      { "id": "backup_frequency", "type": "SINGLE_CHOICE", "dimension": "DIM_BACKUP",
+        "text": { "en-CA": "How often is your business data backed up?", "fr-CA": "À quelle fréquence les données de votre entreprise sont-elles sauvegardées?" },
+        "options": [
+          { "value": "continuous", "points": 30, "label": { "en-CA": "Continuously / hourly", "fr-CA": "En continu / chaque heure" } },
+          { "value": "daily", "points": 25, "label": { "en-CA": "Daily", "fr-CA": "Chaque jour" } },
+          { "value": "weekly", "points": 10, "label": { "en-CA": "Weekly or less", "fr-CA": "Chaque semaine ou moins" } },
+          { "value": "none", "points": 0, "label": { "en-CA": "We don't back up / not sure", "fr-CA": "Aucune sauvegarde / je ne sais pas" } }
+        ] },
+      { "id": "backup_locations", "type": "MULTI_CHOICE", "dimension": "DIM_BACKUP", "maxPoints": 30,
+        "showIf": { "field": "backup_frequency", "op": "ne", "value": "none" },
+        "text": { "en-CA": "Where are backup copies kept? (select all)", "fr-CA": "Où les copies de sauvegarde sont-elles conservées? (cochez tout ce qui s'applique)" },
+        "options": [
+          { "value": "cloud", "points": 15, "label": { "en-CA": "Cloud backup service", "fr-CA": "Service de sauvegarde infonuagique" } },
+          { "value": "offsite_physical", "points": 10, "label": { "en-CA": "Drives stored off-site", "fr-CA": "Disques entreposés hors site" } },
+          { "value": "immutable", "points": 15, "label": { "en-CA": "Immutable / ransomware-proof copy", "fr-CA": "Copie immuable / à l'épreuve des rançongiciels" } },
+          { "value": "same_office", "points": 0, "label": { "en-CA": "Only in the same office", "fr-CA": "Seulement au même bureau" } }
+        ] },
+      { "id": "restore_tested", "type": "SINGLE_CHOICE", "dimension": "DIM_BACKUP",
+        "showIf": { "field": "backup_frequency", "op": "ne", "value": "none" },
+        "text": { "en-CA": "When did you last test restoring from backup?", "fr-CA": "Quand avez-vous testé une restauration pour la dernière fois?" },
+        "options": [
+          { "value": "last_quarter", "points": 30, "label": { "en-CA": "In the last 3 months", "fr-CA": "Au cours des 3 derniers mois" } },
+          { "value": "last_year", "points": 15, "label": { "en-CA": "In the last year", "fr-CA": "Au cours de la dernière année" } },
+          { "value": "never", "points": 0, "label": { "en-CA": "Never / not sure", "fr-CA": "Jamais / je ne sais pas" } }
+        ] },
+      { "id": "backup_in_canada", "type": "BOOLEAN", "dimension": "DIM_BACKUP",
+        "showIf": { "field": "backup_frequency", "op": "ne", "value": "none" },
+        "text": { "en-CA": "Are your backups stored in Canada?", "fr-CA": "Vos sauvegardes sont-elles conservées au Canada?" },
+        "options": [
+          { "value": true, "points": 10, "label": { "en-CA": "Yes", "fr-CA": "Oui" } },
+          { "value": false, "points": 0, "label": { "en-CA": "No / not sure", "fr-CA": "Non / je ne sais pas" } }
+        ] },
+
+      { "id": "incident_response_plan", "type": "BOOLEAN", "dimension": "DIM_GOVERNANCE",
+        "showIf": { "field": "company_size", "op": "gte", "value": 10 },
+        "text": { "en-CA": "Do you have a written incident response plan?", "fr-CA": "Avez-vous un plan d'intervention en cas d'incident écrit?" },
+        "options": [
+          { "value": true, "points": 40, "label": { "en-CA": "Yes", "fr-CA": "Oui" } },
+          { "value": false, "points": 0, "label": { "en-CA": "No", "fr-CA": "Non" } }
+        ] },
+      { "id": "cyber_insurance", "type": "SINGLE_CHOICE", "dimension": "DIM_GOVERNANCE",
+        "showIf": { "field": "company_size", "op": "gte", "value": 10 },
+        "text": { "en-CA": "Do you have cyber insurance?", "fr-CA": "Avez-vous une cyberassurance?" },
+        "options": [
+          { "value": "yes", "points": 30, "label": { "en-CA": "Yes", "fr-CA": "Oui" } },
+          { "value": "applying", "points": 15, "label": { "en-CA": "Applying / renewing", "fr-CA": "Demande ou renouvellement en cours" } },
+          { "value": "no", "points": 0, "label": { "en-CA": "No", "fr-CA": "Non" } }
+        ] },
+      { "id": "compliance_frameworks", "type": "MULTI_CHOICE", "dimension": "DIM_GOVERNANCE", "maxPoints": 30,
+        "showIf": { "field": "company_size", "op": "gte", "value": 25 },
+        "text": { "en-CA": "Which security standards do you follow or report against? (select all)", "fr-CA": "Quelles normes de sécurité suivez-vous? (cochez tout ce qui s'applique)" },
+        "options": [
+          { "value": "soc2", "points": 15, "label": { "en-CA": "SOC 2", "fr-CA": "SOC 2" } },
+          { "value": "iso27001", "points": 15, "label": { "en-CA": "ISO 27001", "fr-CA": "ISO 27001" } },
+          { "value": "pci", "points": 10, "label": { "en-CA": "PCI DSS", "fr-CA": "PCI DSS" } },
+          { "value": "cybersecure_canada", "points": 15, "label": { "en-CA": "CyberSecure Canada", "fr-CA": "CyberSécuritaire Canada" } },
+          { "value": "none", "points": 0, "label": { "en-CA": "None yet", "fr-CA": "Aucune pour l'instant" } }
+        ] }
+    ]
+  },
+
+  "rules": {
+    "agencyLocale": "en-CA",
+    "riskLevels": { "high": 50, "medium": 75 },
+    "summaries": {
+      "HIGH": { "en-CA": "Your business is highly exposed. A few targeted fixes would sharply reduce the chance of a costly incident.", "fr-CA": "Votre entreprise est très exposée. Quelques correctifs ciblés réduiraient fortement le risque d'un incident coûteux." },
+      "MEDIUM": { "en-CA": "You have a solid start, with specific gaps worth closing this quarter.", "fr-CA": "Vous avez une bonne base, avec des lacunes précises à combler ce trimestre." },
+      "LOW": { "en-CA": "Your security posture is strong for a business your size.", "fr-CA": "Votre posture de sécurité est solide pour une entreprise de votre taille." }
+    },
+    "statusOverrides": [
+      { "id": "no_backups", "risk": "HIGH", "when": { "field": "backup_frequency", "op": "eq", "value": "none" } },
+      { "id": "open_perimeter", "risk": "HIGH",
+        "when": { "all": [ { "field": "has_firewall", "op": "eq", "value": false }, { "field": "mfa_coverage", "op": "eq", "value": "none" } ] } }
+    ],
+    "tags": [
+      { "tag": "enterprise_lead", "when": { "any": [ { "field": "company_size", "op": "gte", "value": 50 }, { "field": "it_budget", "op": "in", "value": ["25k_100k", "over_100k"] } ] } },
+      { "tag": "smb_lead", "when": { "field": "company_size", "op": "lt", "value": 50 } },
+      { "tag": "critical_vulnerability", "when": { "any": [
+          { "field": "has_firewall", "op": "eq", "value": false },
+          { "field": "mfa_coverage", "op": "eq", "value": "none" },
+          { "field": "backup_frequency", "op": "eq", "value": "none" },
+          { "field": "patching_cadence", "op": "eq", "value": "never" } ] } },
+      { "tag": "low_budget", "when": { "field": "it_budget", "op": "eq", "value": "under_5k" } },
+      { "tag": "regulated_industry", "when": { "field": "industry", "op": "in", "value": ["healthcare", "finance"] } },
+      { "tag": "backup_gap", "when": { "field": "score.DIM_BACKUP", "op": "lt", "value": 50 } },
+      { "tag": "hot_lead", "when": { "all": [ { "field": "risk.overall", "op": "eq", "value": "HIGH" }, { "field": "it_budget", "op": "ne", "value": "under_5k" } ] } }
+    ],
+    "salesHooks": [
+      { "id": "no_firewall", "priority": 1, "service": "managed_firewall",
+        "when": { "field": "has_firewall", "op": "eq", "value": false },
+        "text": { "en-CA": "Lead lacks basic perimeter defence; prioritize cross-selling managed firewall services.", "fr-CA": "Le prospect n'a pas de défense périmétrique de base; priorisez la vente de services de pare-feu gérés." } },
+      { "id": "no_backups", "priority": 1, "service": "backup_as_a_service",
+        "when": { "field": "backup_frequency", "op": "eq", "value": "none" },
+        "text": { "en-CA": "No backups in place: one ransomware incident could halt operations. Lead with Backup-as-a-Service and a recovery-time demo.", "fr-CA": "Aucune sauvegarde : un seul rançongiciel pourrait paralyser l'entreprise. Proposez la sauvegarde en tant que service et une démonstration de reprise." } },
+      { "id": "mfa_gap", "priority": 2, "service": "identity_security",
+        "when": { "field": "mfa_coverage", "op": "in", "value": ["admins_only", "none"] },
+        "text": { "en-CA": "MFA is not enforced for all staff; position a fixed-fee Microsoft 365 / Google Workspace MFA rollout.", "fr-CA": "L'AMF n'est pas imposée à tout le personnel; proposez un déploiement de l'AMF Microsoft 365 / Google Workspace à prix fixe." } },
+      { "id": "untested_restore", "priority": 2, "service": "backup_as_a_service",
+        "when": { "field": "restore_tested", "op": "eq", "value": "never" },
+        "text": { "en-CA": "Backups have never been restore-tested; offer a free restore drill as a foot in the door.", "fr-CA": "Les sauvegardes n'ont jamais été testées; offrez un exercice de restauration gratuit pour ouvrir la porte." } },
+      { "id": "backups_outside_canada", "priority": 3, "service": "canadian_backup",
+        "when": { "field": "backup_in_canada", "op": "eq", "value": false },
+        "text": { "en-CA": "Backups are stored outside Canada or location unknown; pitch Canadian-hosted backup for residency and client trust.", "fr-CA": "Les sauvegardes sont hors du Canada ou à un endroit inconnu; proposez une sauvegarde hébergée au Canada." } },
+      { "id": "self_managed_firewall", "priority": 3, "service": "co_managed_soc",
+        "when": { "field": "firewall_managed", "op": "in", "value": ["in_house", "unsure"] },
+        "text": { "en-CA": "Firewall is self-managed or unmonitored; pitch co-managed 24/7 monitoring rather than a replacement.", "fr-CA": "Le pare-feu est géré à l'interne ou non surveillé; proposez une surveillance cogérée 24/7 plutôt qu'un remplacement." } },
+      { "id": "awareness_gap", "priority": 4, "service": "security_awareness",
+        "when": { "any": [ { "field": "security_training", "op": "in", "value": ["never", "onboarding_only"] }, { "field": "phishing_simulation", "op": "eq", "value": false } ] },
+        "text": { "en-CA": "Security awareness gap; bundle phishing simulations with quarterly training.", "fr-CA": "Lacune de sensibilisation; regroupez simulations d'hameçonnage et formation trimestrielle." } },
+      { "id": "no_ir_plan", "priority": 4, "service": "incident_response",
+        "when": { "field": "incident_response_plan", "op": "eq", "value": false },
+        "text": { "en-CA": "No incident response plan; offer a tabletop-exercise workshop that also supports their insurance application.", "fr-CA": "Aucun plan d'intervention; offrez un atelier de simulation qui appuie aussi leur demande d'assurance." } },
+      { "id": "insurance_readiness", "priority": 5, "service": "insurance_readiness",
+        "when": { "field": "cyber_insurance", "op": "in", "value": ["no", "applying"] },
+        "text": { "en-CA": "Cyber insurance missing or pending; use the insurer's security questionnaire as the remediation roadmap.", "fr-CA": "Cyberassurance absente ou en cours; utilisez le questionnaire de l'assureur comme feuille de route." } },
+      { "id": "regulated_industry", "priority": 5, "service": "compliance_support",
+        "when": { "field": "industry", "op": "in", "value": ["healthcare", "finance"] },
+        "text": { "en-CA": "Regulated industry; emphasize Canadian data residency and audit-ready evidence.", "fr-CA": "Secteur réglementé; mettez l'accent sur la résidence des données au Canada et les preuves prêtes pour l'audit." } }
+    ]
+  },
+
+  "crmMapping": {
+    "hubspot": {
+      "contact": {
+        "email": "lead.corporate_email",
+        "firstname": "lead.first_name",
+        "lastname": "lead.last_name",
+        "company": "lead.company_name",
+        "phone": "lead.phone",
+        "jobtitle": "lead.job_title",
+        "state": "lead.province",
+        "cyber_risk_score": { "path": "score.overall", "format": "number" },
+        "cyber_risk_level": "risk.overall",
+        "cyber_risk_tags": { "path": "tags", "format": "multi" },
+        "cyber_network_score": { "path": "score.DIM_NETWORK", "format": "number" },
+        "cyber_awareness_score": { "path": "score.DIM_AWARENESS", "format": "number" },
+        "cyber_backup_score": { "path": "score.DIM_BACKUP", "format": "number" },
+        "cyber_governance_score": { "path": "score.DIM_GOVERNANCE", "format": "number" },
+        "cyber_sales_hooks": { "path": "hooks", "format": "lines" },
+        "cyber_assessment_id": "submission.id",
+        "cyber_assessment_date": { "path": "submission.occurredAt", "format": "date" },
+        "cyber_assessment_locale": "submission.locale",
+        "cyber_casl_consent": { "path": "consent.marketing.granted", "format": "bool" },
+        "cyber_casl_consent_date": { "path": "consent.marketing.at", "format": "date" }
+      },
+      "company": {
+        "name": "lead.company_name",
+        "domain": "lead.email_domain",
+        "numberofemployees": { "path": "answers.company_size", "format": "number" },
+        "cyber_industry": "answers.industry"
+      },
+      "note": true
+    }
+  },
+
+  "outputConfiguration": {
+    "generateReport": true,
+    "visualization": { "defaultView": "RADAR_CHART" }
+  },
+
+  "compliance": {
+    "jurisdictions": ["CA-ON", "CA-QC"],
+    "dataResidency": "CA",
+    "retentionDays": 730,
+    "privacyNotice": {
+      "en-CA": "Northbeam IT Services collects your contact details and answers to calculate your score and to follow up with you about it. We keep them for up to 2 years. You can ask to see or delete your information at privacy@northbeam.example.",
+      "fr-CA": "Northbeam IT Services recueille vos coordonnées et vos réponses pour calculer votre note et faire un suivi avec vous. Nous les conservons jusqu'à 2 ans. Vous pouvez demander à consulter ou à supprimer vos renseignements à privacy@northbeam.example."
+    },
+    "sharingDisclosure": {
+      "en-CA": "Your answers and contact details are shared with Northbeam IT's sales team and stored in its customer relationship management system.",
+      "fr-CA": "Vos réponses et coordonnées sont communiquées à l'équipe des ventes de Northbeam IT et conservées dans son système de gestion de la relation client."
+    },
+    "marketingConsent": {
+      "senderName": "Northbeam IT Services Inc.",
+      "text": {
+        "en-CA": "Yes, Northbeam IT Services Inc. may email me cybersecurity tips and offers. I can unsubscribe at any time.",
+        "fr-CA": "Oui, Northbeam IT Services Inc. peut m'envoyer par courriel des conseils et des offres en cybersécurité. Je peux me désabonner en tout temps."
+      }
+    }
+  }
+}

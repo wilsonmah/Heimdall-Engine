@@ -35,6 +35,37 @@ CREATE TABLE IF NOT EXISTS audit_log (
   action TEXT NOT NULL, subject TEXT, detail TEXT);
 """
 
+LEADGEN_SQL = """
+CREATE TABLE IF NOT EXISTS submissions (
+  id TEXT PRIMARY KEY, template_id TEXT NOT NULL, version_no INTEGER NOT NULL, semver TEXT NOT NULL,
+  locale TEXT NOT NULL, lead_email TEXT NOT NULL, company_name TEXT, score REAL, risk TEXT,
+  tags TEXT NOT NULL, public_payload TEXT NOT NULL, agency_payload TEXT NOT NULL,
+  created_at TEXT NOT NULL, expires_at TEXT);
+CREATE INDEX IF NOT EXISTS ix_sub_tpl ON submissions(template_id, created_at);
+CREATE INDEX IF NOT EXISTS ix_sub_email ON submissions(lead_email);
+CREATE INDEX IF NOT EXISTS ix_sub_expiry ON submissions(expires_at);
+CREATE TABLE IF NOT EXISTS crm_destinations (
+  id TEXT PRIMARY KEY, name TEXT NOT NULL, kind TEXT NOT NULL, config TEXT NOT NULL,
+  region TEXT NOT NULL, allow_cross_border INTEGER NOT NULL DEFAULT 0, template_ids TEXT,
+  enabled INTEGER NOT NULL DEFAULT 1, created_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS crm_outbox (
+  id TEXT PRIMARY KEY, submission_id TEXT NOT NULL, destination_id TEXT NOT NULL,
+  status TEXT NOT NULL, attempts INTEGER NOT NULL DEFAULT 0, next_attempt_at TEXT,
+  last_error TEXT, reason TEXT, state TEXT NOT NULL DEFAULT '{}', result TEXT,
+  created_at TEXT NOT NULL, updated_at TEXT NOT NULL, delivered_at TEXT,
+  UNIQUE (submission_id, destination_id));
+CREATE INDEX IF NOT EXISTS ix_outbox_due ON crm_outbox(status, next_attempt_at);
+CREATE TABLE IF NOT EXISTS form_keys (
+  key TEXT PRIMARY KEY, template_id TEXT NOT NULL, allowed_origins TEXT NOT NULL,
+  enabled INTEGER NOT NULL DEFAULT 1, created_at TEXT NOT NULL);
+"""
+
+# Append only. Each entry runs once per database, in order.
+MIGRATIONS = [
+    (1, "core: templates, evaluations, audit", SCHEMA_SQL),
+    (2, "lead-gen: submissions, CRM destinations, outbox, form keys", LEADGEN_SQL),
+]
+
 
 def now():
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
@@ -58,8 +89,22 @@ class ValidationFailed(Exception):
 class Store:
     def __init__(self, path):
         self.path = str(path)
+        self.migrate()
+
+    def migrate(self):
         with self.conn() as c:
-            c.executescript(SCHEMA_SQL)
+            c.execute("CREATE TABLE IF NOT EXISTS schema_migrations "
+                      "(version INTEGER PRIMARY KEY, name TEXT NOT NULL, applied_at TEXT NOT NULL)")
+            done = {r[0] for r in c.execute("SELECT version FROM schema_migrations")}
+            for version, name, sql in MIGRATIONS:
+                if version in done:
+                    continue
+                c.executescript(sql)
+                c.execute("INSERT INTO schema_migrations VALUES (?,?,?)", (version, name, now()))
+
+    def schema_version(self):
+        with self.conn() as c:
+            return c.execute("SELECT MAX(version) FROM schema_migrations").fetchone()[0]
 
     @contextmanager
     def conn(self):
@@ -187,19 +232,159 @@ class Store:
             self._audit(c, review["reviewer"], "evaluation.review", eid,
                         {"decision": review["decision"], "finalScore": review["finalScore"]})
 
-    # ------------------------------------------------------------- privacy
-    def erase_subject(self, entity_id, actor=None):
+    # ---------------------------------------------------------- submissions
+    def create_submission(self, sid, tpl_row, locale, lead, score, risk, tags, public, agency,
+                          retention_days, outbox_plan):
+        """Stores the submission and its outbox rows in ONE transaction
+        (transactional outbox): a lead is never saved without its CRM jobs."""
+        created = datetime.now(timezone.utc)
+        ts = created.isoformat(timespec="seconds")
+        expires = (created + timedelta(days=retention_days)).isoformat(timespec="seconds") if retention_days else None
         with self.tx() as c:
-            n = c.execute("DELETE FROM evaluations WHERE entity_id=?", (entity_id,)).rowcount
-            self._audit(c, actor, "subject.erase", subject_hash(entity_id), {"evaluationsDeleted": n})
+            c.execute("INSERT INTO submissions VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                      (sid, tpl_row["template_id"], tpl_row["version_no"], tpl_row["semver"], locale,
+                       lead["corporate_email"], lead.get("company_name"), score, risk, json.dumps(tags),
+                       json.dumps(public, ensure_ascii=False), json.dumps(agency, ensure_ascii=False), ts, expires))
+            for dest_id, status, reason in outbox_plan:
+                c.execute("INSERT INTO crm_outbox (id, submission_id, destination_id, status, next_attempt_at, "
+                          "reason, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?)",
+                          ("ob_" + uuid.uuid4().hex[:16], sid, dest_id, status,
+                           ts if status == "PENDING" else None, reason, ts, ts))
+                if status == "BLOCKED":
+                    self._audit(c, "system", "crm.blocked", sid, {"destination": dest_id, "reason": reason})
+        return self.get_submission(sid)
+
+    def get_submission(self, sid):
+        with self.conn() as c:
+            return c.execute("SELECT * FROM submissions WHERE id=?", (sid,)).fetchone()
+
+    def list_submissions(self, template_id=None, email=None, limit=50):
+        sql, args = "SELECT * FROM submissions WHERE 1=1", []
+        if template_id:
+            sql += " AND template_id=?"
+            args.append(template_id)
+        if email:
+            sql += " AND lead_email=?"
+            args.append(email.lower())
+        with self.conn() as c:
+            return c.execute(sql + " ORDER BY created_at DESC, rowid DESC LIMIT ?", (*args, limit)).fetchall()
+
+    # ------------------------------------------------------- CRM destinations
+    def create_destination(self, name, kind, config, region, allow_cross_border, template_ids, actor=None):
+        did = "dst_" + uuid.uuid4().hex[:12]
+        with self.tx() as c:
+            c.execute("INSERT INTO crm_destinations VALUES (?,?,?,?,?,?,?,?,?)",
+                      (did, name, kind, json.dumps(config), region.lower(), int(bool(allow_cross_border)),
+                       json.dumps(template_ids) if template_ids else None, 1, now()))
+            self._audit(c, actor, "crm.destination.create", did,
+                        {"name": name, "kind": kind, "region": region, "allowCrossBorder": bool(allow_cross_border)})
+        return self.get_destination(did)
+
+    def set_destination_enabled(self, did, enabled, actor=None):
+        with self.tx() as c:
+            n = c.execute("UPDATE crm_destinations SET enabled=? WHERE id=?", (int(enabled), did)).rowcount
+            if n:
+                self._audit(c, actor, "crm.destination.enable" if enabled else "crm.destination.disable", did)
             return n
 
-    def purge_expired(self, actor=None):
+    def get_destination(self, did):
+        with self.conn() as c:
+            return c.execute("SELECT * FROM crm_destinations WHERE id=?", (did,)).fetchone()
+
+    def list_destinations(self):
+        with self.conn() as c:
+            return c.execute("SELECT * FROM crm_destinations ORDER BY created_at").fetchall()
+
+    def destinations_for(self, template_id):
+        return [d for d in self.list_destinations()
+                if d["enabled"] and (not d["template_ids"] or template_id in json.loads(d["template_ids"]))]
+
+    # ------------------------------------------------------------- outbox
+    def claim_due_outbox(self, limit=20):
+        ts = now()
         with self.tx() as c:
-            n = c.execute("DELETE FROM evaluations WHERE expires_at IS NOT NULL AND expires_at < ?",
-                          (now(),)).rowcount
-            self._audit(c, actor, "retention.purge", None, {"evaluationsDeleted": n})
+            return c.execute(
+                "UPDATE crm_outbox SET status='SENDING', updated_at=? WHERE id IN ("
+                " SELECT id FROM crm_outbox WHERE status='PENDING' AND next_attempt_at<=?"
+                " ORDER BY next_attempt_at LIMIT ?) RETURNING *", (ts, ts, limit)).fetchall()
+
+    def finish_outbox(self, oid, status, attempts, state, next_attempt_at=None, error=None, result=None,
+                      reason=None):
+        ts = now()
+        with self.conn() as c:
+            c.execute("UPDATE crm_outbox SET status=?, attempts=?, state=?, next_attempt_at=?, last_error=?, "
+                      "result=?, reason=COALESCE(?, reason), updated_at=?, delivered_at=? WHERE id=?",
+                      (status, attempts, json.dumps(state), next_attempt_at, error,
+                       json.dumps(result) if result is not None else None, reason, ts,
+                       ts if status == "DELIVERED" else None, oid))
+
+    def reset_stale_sending(self):
+        """A crash mid-send leaves rows SENDING; put them back in the queue."""
+        with self.conn() as c:
+            return c.execute("UPDATE crm_outbox SET status='PENDING', next_attempt_at=? WHERE status='SENDING'",
+                             (now(),)).rowcount
+
+    def list_outbox(self, status=None, submission_id=None, limit=100):
+        sql, args = "SELECT * FROM crm_outbox WHERE 1=1", []
+        for col, val in (("status", status), ("submission_id", submission_id)):
+            if val:
+                sql += f" AND {col}=?"
+                args.append(val)
+        with self.conn() as c:
+            return c.execute(sql + " ORDER BY created_at DESC, rowid DESC LIMIT ?", (*args, limit)).fetchall()
+
+    def get_outbox(self, oid):
+        with self.conn() as c:
+            return c.execute("SELECT * FROM crm_outbox WHERE id=?", (oid,)).fetchone()
+
+    def retry_outbox(self, oid, actor=None):
+        with self.tx() as c:
+            n = c.execute("UPDATE crm_outbox SET status='PENDING', next_attempt_at=?, attempts=0, updated_at=? "
+                          "WHERE id=? AND status='FAILED'", (now(), now(), oid)).rowcount
+            if n:
+                self._audit(c, actor, "crm.retry", oid)
             return n
+
+    # ------------------------------------------------------------ form keys
+    def create_form_key(self, template_id, allowed_origins, actor=None):
+        key = "pk_" + uuid.uuid4().hex
+        with self.tx() as c:
+            c.execute("INSERT INTO form_keys VALUES (?,?,?,?,?)",
+                      (key, template_id, json.dumps(allowed_origins), 1, now()))
+            self._audit(c, actor, "form.key.create", template_id, {"allowedOrigins": allowed_origins})
+        return key
+
+    def get_form_key(self, key):
+        with self.conn() as c:
+            return c.execute("SELECT * FROM form_keys WHERE key=? AND enabled=1", (key,)).fetchone()
+
+    def list_form_keys(self):
+        with self.conn() as c:
+            return c.execute("SELECT * FROM form_keys ORDER BY created_at").fetchall()
+
+    # ------------------------------------------------------------- privacy
+    def erase_subject(self, entity_id, actor=None):
+        """Deletes evaluations by entity id and lead submissions by email, with
+        their outbox rows. Data already delivered to a CRM must be erased there too."""
+        with self.tx() as c:
+            n = c.execute("DELETE FROM evaluations WHERE entity_id=?", (entity_id,)).rowcount
+            subs = [r[0] for r in c.execute("SELECT id FROM submissions WHERE lead_email=?", (entity_id.lower(),))]
+            for sid in subs:
+                c.execute("DELETE FROM crm_outbox WHERE submission_id=?", (sid,))
+                c.execute("DELETE FROM submissions WHERE id=?", (sid,))
+            self._audit(c, actor, "subject.erase", subject_hash(entity_id.lower() if subs else entity_id),
+                        {"evaluationsDeleted": n, "submissionsDeleted": len(subs)})
+            return n + len(subs)
+
+    def purge_expired(self, actor=None):
+        ts = now()
+        with self.tx() as c:
+            n = c.execute("DELETE FROM evaluations WHERE expires_at IS NOT NULL AND expires_at < ?", (ts,)).rowcount
+            c.execute("DELETE FROM crm_outbox WHERE submission_id IN "
+                      "(SELECT id FROM submissions WHERE expires_at IS NOT NULL AND expires_at < ?)", (ts,))
+            m = c.execute("DELETE FROM submissions WHERE expires_at IS NOT NULL AND expires_at < ?", (ts,)).rowcount
+            self._audit(c, actor, "retention.purge", None, {"evaluationsDeleted": n, "submissionsDeleted": m})
+            return n + m
 
     def list_audit(self, limit=100):
         with self.conn() as c:

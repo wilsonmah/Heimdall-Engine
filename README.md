@@ -17,8 +17,14 @@ suppliers, AI agents — from JSON templates that the customer's own team owns.
   purpose, retention, consent and an automated-decision notice (PIPEDA,
   Quebec Law 25, Ontario's AI-in-hiring disclosure). Results about people go
   to human review; access, erasure and retention purge are API calls.
-- **English / French.** Any template text can be `{"en": ..., "fr": ...}`;
+- **English / French.** Any template text can be `{"en-CA": ..., "fr-CA": ...}`;
   responses follow `Accept-Language`.
+- **Lead-gen diagnostics.** Question-based risk calculators for MSPs,
+  accounting firms and agencies: skip logic, weighted risk categories, risk
+  tags and sales hooks; an instant public score for the website and a silent,
+  asynchronous push of the full lead to HubSpot or a signed webhook
+  (Zapier / Make). Canadian data residency and CASL consent are enforced.
+  See [docs/LEADGEN.md](docs/LEADGEN.md) and run `python examples/demo_leadgen.py`.
 
 > Status: prototype. Standard library only (Python 3.11+), SQLite storage,
 > process-level sandbox. See [docs/ROADMAP.md](docs/ROADMAP.md) for the path
@@ -75,10 +81,14 @@ every evaluation (`GET /v1/evaluations/{id}?trace=1`).
 | `evalcore/schema/` | JSON Schema for templates |
 | `evalcore/validation.py` | structural + semantic template checks |
 | `evalcore/compliance.py` | Canadian privacy rules |
-| `evalcore/pipeline.py` | payload ingestion, output contract, `evaluate()` |
+| `evalcore/pipeline.py` | payload ingestion, output contract, `evaluate()` (script mode) |
 | `evalcore/sandbox.py` | scoring-script execution |
-| `evalcore/store.py` | versioned templates, evaluations, audit log (SQLite) |
-| `evalcore/api.py` | REST API |
+| `evalcore/assessment.py` | question-based scoring: skip logic, deductions, risk, tags, hooks, the two payloads |
+| `evalcore/conditions.py` | rule language shared by skip logic, tags, hooks and CRM mapping |
+| `evalcore/residency.py` | data-residency policy for storage and outbound CRM |
+| `evalcore/crm/` | CRM mapping, HubSpot and webhook adapters, async outbox dispatcher |
+| `evalcore/store.py` | migrations; templates, evaluations, submissions, outbox, audit log (SQLite) |
+| `evalcore/api.py` | REST API (admin `/v1`, public `/public/v1`) |
 | `templates/` | example templates (seeded on `serve`) |
 | `examples/payloads/` | example payloads |
 | `docs/` | [API reference](docs/API.md), [template guide](docs/TEMPLATES.md), [roadmap](docs/ROADMAP.md) |

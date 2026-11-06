@@ -145,14 +145,16 @@ class Sandbox(unittest.TestCase):
 
 class I18n(unittest.TestCase):
     def test_pick_lang(self):
-        self.assertEqual(pick_lang("fr-CA,fr;q=0.9,en;q=0.8"), "fr")
-        self.assertEqual(pick_lang("de-DE"), "en")
-        self.assertEqual(pick_lang("fr-CA", override="en"), "en")
+        self.assertEqual(pick_lang("fr-CA,fr;q=0.9,en;q=0.8"), "fr-CA")
+        self.assertEqual(pick_lang("fr"), "fr-CA")
+        self.assertEqual(pick_lang("de-DE"), "en-CA")
+        self.assertEqual(pick_lang("fr-CA", override="en"), "en-CA")
 
     def test_text(self):
-        self.assertEqual(text({"en": "Quality", "fr": "Qualité"}, "fr"), "Qualité")
-        self.assertEqual(text({"en": "Quality"}, "fr"), "Quality")
-        self.assertEqual(text("Plain", "fr"), "Plain")
+        self.assertEqual(text({"en": "Quality", "fr": "Qualité"}, "fr-CA"), "Qualité")
+        self.assertEqual(text({"en-CA": "Quality", "fr-CA": "Qualité"}, "fr"), "Qualité")
+        self.assertEqual(text({"en": "Quality"}, "fr-CA"), "Quality")
+        self.assertEqual(text("Plain", "fr-CA"), "Plain")
 
 
 if __name__ == "__main__":

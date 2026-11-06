@@ -1,10 +1,17 @@
-"""Template validation: structure (JSON Schema) -> semantics -> compliance."""
+"""Template validation: structure (JSON Schema) -> semantics -> compliance.
+
+Two scoring modes share the same dimensions/weights:
+* SCRIPT  - dataIngestion channels + calculationEngine.script (sandboxed Python)
+* POINTS  - an `assessment` section: questions with option points, skip logic,
+            rules for risk, tags and sales hooks (see assessment.py)
+"""
 import json
 import re
 from functools import lru_cache
 from pathlib import Path
 
-from . import compliance
+from . import assessment, compliance
+from .crm import mapping
 from .jsonschema_lite import schema_errors
 
 SCHEMA_PATH = Path(__file__).resolve().parent / "schema" / "evaluation-template.schema.json"
@@ -15,16 +22,14 @@ def template_schema():
     return json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
 
 
-def semantic_errors(tpl):
-    errs = []
-    dims = tpl["evaluationMatrix"]["dimensions"]
-    codes = [d["code"] for d in dims]
-    if len(set(codes)) != len(codes):
-        errs.append("evaluationMatrix: duplicate dimension codes")
-    total = sum(d["weight"] for d in dims)
-    if abs(total - 1.0) > 1e-6:
-        errs.append(f"evaluationMatrix: weights sum to {total:g}, expected 1.0")
+def scoring_mode(tpl):
+    return "POINTS" if "assessment" in tpl else "SCRIPT"
 
+
+def _script_errors(tpl, codes):
+    errs = []
+    if "dataIngestion" not in tpl or "calculationEngine" not in tpl:
+        return ["SCRIPT templates need dataIngestion and calculationEngine (or add an assessment section)"]
     chan_ids = [c["channelId"] for c in tpl["dataIngestion"]["channels"]]
     if len(set(chan_ids)) != len(chan_ids):
         errs.append("dataIngestion: duplicate channelId")
@@ -39,12 +44,9 @@ def semantic_errors(tpl):
                 errs.append(f"{c['channelId']}.{f['fieldCode']}: binds to unknown dimension {b}")
             if "min" in f and "max" in f and f["min"] > f["max"]:
                 errs.append(f"{c['channelId']}.{f['fieldCode']}: min > max")
-
-    th = tpl.get("outputConfiguration", {}).get("visualization", {}).get("thresholds")
-    if th and th["critical"] >= th["excellent"]:
-        errs.append("thresholds: critical must be below excellent")
-
     eng = tpl["calculationEngine"]
+    if "script" not in eng:
+        return errs + ["calculationEngine.script: required in SCRIPT mode"]
     entry = eng.get("entrypoint", "calculate_scores")
     try:
         compile(eng["script"], "<template-script>", "exec")
@@ -59,11 +61,33 @@ def semantic_errors(tpl):
     return errs
 
 
+def semantic_errors(tpl):
+    errs = []
+    dims = tpl["evaluationMatrix"]["dimensions"]
+    codes = [d["code"] for d in dims]
+    if len(set(codes)) != len(codes):
+        errs.append("evaluationMatrix: duplicate dimension codes")
+    total = sum(d["weight"] for d in dims)
+    if abs(total - 1.0) > 1e-6:
+        errs.append(f"evaluationMatrix: weights sum to {total:g}, expected 1.0")
+    th = tpl.get("outputConfiguration", {}).get("visualization", {}).get("thresholds")
+    if th and th["critical"] >= th["excellent"]:
+        errs.append("thresholds: critical must be below excellent")
+
+    if scoring_mode(tpl) == "POINTS":
+        errs += assessment.template_errors(tpl)
+    else:
+        errs += _script_errors(tpl, codes)
+    if "crmMapping" in tpl:
+        errs += mapping.mapping_errors(tpl)
+    return errs
+
+
 def validate_template(tpl, trace):
     for stage_errors in (
         lambda: schema_errors(tpl, template_schema()),
         lambda: semantic_errors(tpl),
-        lambda: compliance.template_errors(tpl),
+        lambda: compliance.template_errors(tpl) + compliance.lead_template_errors(tpl),
     ):
         errs = stage_errors()
         for e in errs:
