@@ -1,0 +1,8 @@
+{
+  "targetType": "AI_AGENT",
+  "entity_id": "x",
+  "channels": {
+    "ch_automated_telemetry": { "error_rate_percentage": 2 },
+    "ch_manual_ui": { "input_manager_score": 14 }
+  }
+}

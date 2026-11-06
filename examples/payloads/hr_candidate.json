@@ -1,0 +1,10 @@
+{
+  "targetType": "HUMAN_CANDIDATE",
+  "entity_id": "cand-20261106-114",
+  "source_system_code": "BAMBOOHR",
+  "consent": { "obtained": true, "obtainedAt": "2026-11-04T15:20:00-05:00", "method": "application-form-checkbox" },
+  "channels": {
+    "ch_automated_telemetry": { "execution_latency_ms": 2400 },
+    "ch_manual_ui": { "input_manager_score": 6 }
+  }
+}

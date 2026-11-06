@@ -1,0 +1,13 @@
+{
+  "targetType": "VENDOR_ENTITY",
+  "vendor_id": "VEND-00417",
+  "source_system_code": "QBO",
+  "channels": {
+    "ch_erp_export": {
+      "units_received": 4200, "units_defective": 63,
+      "orders_total": 38, "orders_on_time": 34,
+      "avg_unit_price_cad": 12.40, "benchmark_unit_price_cad": 11.90
+    },
+    "ch_buyer_review": { "buyer_quality_rating": 4 }
+  }
+}

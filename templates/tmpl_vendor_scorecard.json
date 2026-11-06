@@ -1,0 +1,72 @@
+{
+  "$schema": "../evalcore/schema/evaluation-template.schema.json",
+  "evaluationTemplateId": "tmpl_vendor_scorecard",
+  "name": { "en": "Supplier Scorecard", "fr": "Fiche d'évaluation des fournisseurs" },
+  "version": "1.0.0",
+  "meta": {
+    "createdBy": "Platform team",
+    "description": "Quarterly supplier review: quality, on-time delivery and price competitiveness (CAD)."
+  },
+
+  "targetSchema": {
+    "allowedTypes": ["VENDOR_ENTITY"],
+    "identifierMapping": { "primaryKey": "vendor_id", "externalSystemRef": "source_system_code" }
+  },
+
+  "evaluationMatrix": {
+    "dimensions": [
+      { "code": "DIM_QUALITY", "name": { "en": "Quality", "fr": "Qualité" }, "weight": 0.60 },
+      { "code": "DIM_DELIVERY", "name": { "en": "On-time delivery", "fr": "Livraison à temps" }, "weight": 0.25 },
+      { "code": "DIM_PRICE", "name": { "en": "Price competitiveness", "fr": "Compétitivité des prix" }, "weight": 0.15 }
+    ]
+  },
+
+  "dataIngestion": {
+    "channels": [
+      {
+        "channelId": "ch_erp_export",
+        "type": "DATA_PIPELINE",
+        "enabled": true,
+        "$comment": "e.g. nightly export from QuickBooks Online / Sage / NetSuite",
+        "validationSchema": {
+          "type": "object",
+          "required": ["units_received", "units_defective", "orders_total", "orders_on_time"],
+          "properties": {
+            "units_received": { "type": "integer", "minimum": 1 },
+            "units_defective": { "type": "integer", "minimum": 0 },
+            "orders_total": { "type": "integer", "minimum": 1 },
+            "orders_on_time": { "type": "integer", "minimum": 0 },
+            "avg_unit_price_cad": { "type": "number", "minimum": 0 },
+            "benchmark_unit_price_cad": { "type": "number", "minimum": 0 }
+          }
+        }
+      },
+      {
+        "channelId": "ch_buyer_review",
+        "type": "DYNAMIC_FORM",
+        "enabled": true,
+        "fields": [
+          {
+            "fieldCode": "buyer_quality_rating",
+            "label": { "en": "Buyer quality rating", "fr": "Évaluation de la qualité par l'acheteur" },
+            "type": "NUMBER_SLIDER", "min": 1, "max": 5,
+            "bindToDimension": "DIM_QUALITY"
+          }
+        ]
+      }
+    ]
+  },
+
+  "calculationEngine": {
+    "runtime": "PYTHON_3_11",
+    "entrypoint": "calculate_scores",
+    "timeoutMs": 2000,
+    "memoryLimitMb": 128,
+    "script": "def calculate_scores(d, m):\n    defect_rate = d['units_defective'] / d['units_received']\n    measured_quality = max(0, 100 - defect_rate * 1000)  # 10% defects -> 0\n    rating = d.get('buyer_quality_rating')\n    quality = measured_quality if rating is None else 0.7 * measured_quality + 0.3 * (rating * 20)\n\n    delivery = 100 * min(d['orders_on_time'], d['orders_total']) / d['orders_total']\n\n    price, bench = d.get('avg_unit_price_cad'), d.get('benchmark_unit_price_cad')\n    if price and bench:\n        price_score = max(0, min(100, 100 - (price / bench - 1) * 200))  # 10% over benchmark -> 80\n    else:\n        price_score = 50\n\n    s = {'DIM_QUALITY': round(quality, 1), 'DIM_DELIVERY': round(delivery, 1), 'DIM_PRICE': round(price_score, 1)}\n    total = sum(s[k] * m[k]['weight'] for k in s)\n    return {'compositeScore': round(total, 2), 'breakdown': s}\n"
+  },
+
+  "outputConfiguration": {
+    "generateReport": true,
+    "visualization": { "defaultView": "BAR_CHART", "thresholds": { "critical": 65, "excellent": 90 } }
+  }
+}

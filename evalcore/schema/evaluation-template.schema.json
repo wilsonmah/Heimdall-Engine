@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "evaluation-template.schema.json",
+  "title": "Evaluation Template",
+  "type": "object",
+  "required": ["evaluationTemplateId", "name", "version", "targetSchema", "evaluationMatrix", "dataIngestion", "calculationEngine", "outputConfiguration"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "evaluationTemplateId": { "type": "string", "pattern": "^tmpl_[a-z0-9_]+$" },
+    "name": { "anyOf": [
+      { "type": "string", "minLength": 1 },
+      { "type": "object", "required": ["en"], "properties": { "en": { "type": "string", "minLength": 1 }, "fr": { "type": "string" } }, "additionalProperties": false }
+    ] },
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "meta": { "type": "object" },
+    "targetSchema": {
+      "type": "object",
+      "required": ["allowedTypes", "identifierMapping"],
+      "properties": {
+        "$comment": { "type": "string" },
+        "allowedTypes": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "enum": ["HUMAN_CANDIDATE", "AI_AGENT", "VENDOR_ENTITY"] }
+        },
+        "identifierMapping": {
+          "type": "object",
+          "required": ["primaryKey"],
+          "properties": {
+            "primaryKey": { "type": "string" },
+            "externalSystemRef": { "type": "string" }
+          }
+        }
+      }
+    },
+    "evaluationMatrix": {
+      "type": "object",
+      "required": ["dimensions"],
+      "properties": {
+        "$comment": { "type": "string" },
+        "dimensions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["code", "name", "weight"],
+            "additionalProperties": false,
+            "properties": {
+              "code": { "type": "string", "pattern": "^DIM_[A-Z0-9_]+$" },
+              "name": { "anyOf": [ { "type": "string" }, { "type": "object", "required": ["en"] } ] },
+              "weight": { "type": "number", "minimum": 0, "maximum": 1 },
+              "description": { "anyOf": [ { "type": "string" }, { "type": "object", "required": ["en"] } ] }
+            }
+          }
+        }
+      }
+    },
+    "dataIngestion": {
+      "type": "object",
+      "required": ["channels"],
+      "properties": {
+        "$comment": { "type": "string" },
+        "channels": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["channelId", "type", "enabled"],
+            "properties": {
+              "channelId": { "type": "string", "pattern": "^ch_[a-z0-9_]+$" },
+              "type": { "enum": ["DYNAMIC_FORM", "WEBHOOK_PAYLOAD", "DATA_PIPELINE"] },
+              "enabled": { "type": "boolean" },
+              "fields": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["fieldCode", "type"],
+                  "properties": {
+                    "fieldCode": { "type": "string" },
+                    "label": { "anyOf": [ { "type": "string" }, { "type": "object", "required": ["en"] } ] },
+                    "type": { "enum": ["NUMBER_SLIDER", "TEXT", "SELECT", "BOOLEAN"] },
+                    "min": { "type": "number" },
+                    "max": { "type": "number" },
+                    "bindToDimension": { "type": "string" }
+                  }
+                }
+              },
+              "validationSchema": { "type": "object" }
+            }
+          }
+        }
+      }
+    },
+    "calculationEngine": {
+      "type": "object",
+      "required": ["runtime", "script", "timeoutMs"],
+      "properties": {
+        "$comment": { "type": "string" },
+        "runtime": { "enum": ["PYTHON_3_11", "PYTHON_3_12"] },
+        "entrypoint": { "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*$" },
+        "timeoutMs": { "type": "integer", "minimum": 100, "maximum": 30000 },
+        "memoryLimitMb": { "type": "integer", "minimum": 16, "maximum": 1024 },
+        "script": { "type": "string", "minLength": 1 }
+      }
+    },
+    "outputConfiguration": {
+      "type": "object",
+      "properties": {
+        "$comment": { "type": "string" },
+        "generateReport": { "type": "boolean" },
+        "visualization": {
+          "type": "object",
+          "properties": {
+            "defaultView": { "enum": ["RADAR_CHART", "BAR_CHART", "TABLE"] },
+            "colorPalette": { "type": "string" },
+            "thresholds": {
+              "type": "object",
+              "required": ["critical", "excellent"],
+              "properties": {
+                "critical": { "type": "number", "minimum": 0, "maximum": 100 },
+                "excellent": { "type": "number", "minimum": 0, "maximum": 100 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "compliance": {
+      "$comment": "Required when allowedTypes includes HUMAN_CANDIDATE; rules in evalcore/compliance.py",
+      "type": "object",
+      "properties": {
+        "$comment": { "type": "string" },
+        "jurisdictions": {
+          "type": "array",
+          "items": { "enum": ["CA", "CA-AB", "CA-BC", "CA-MB", "CA-NB", "CA-NL", "CA-NS", "CA-NT", "CA-NU", "CA-ON", "CA-PE", "CA-QC", "CA-SK", "CA-YT"] }
+        },
+        "dataResidency": { "enum": ["CA", "ANY"] },
+        "purpose": { "anyOf": [ { "type": "string", "minLength": 1 }, { "type": "object", "required": ["en"] } ] },
+        "retentionDays": { "type": "integer", "minimum": 1 },
+        "consentRequired": { "type": "boolean" },
+        "automatedDecision": {
+          "type": "object",
+          "properties": {
+            "humanReviewRequired": { "type": "boolean" },
+            "disclosureNotice": { "anyOf": [ { "type": "string", "minLength": 1 }, { "type": "object", "required": ["en"] } ] }
+          }
+        },
+        "personalDataFields": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

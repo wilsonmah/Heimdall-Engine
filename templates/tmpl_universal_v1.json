@@ -1,0 +1,106 @@
+{
+  "$schema": "../evalcore/schema/evaluation-template.schema.json",
+  "evaluationTemplateId": "tmpl_universal_v1",
+  "name": { "en": "Cross-Domain Evaluation Blueprint", "fr": "Modèle d'évaluation multidomaine" },
+  "version": "1.3.0",
+  "meta": {
+    "createdBy": "Platform team",
+    "description": "One template that scores both people (candidates) and machines (AI agents)."
+  },
+
+  "targetSchema": {
+    "allowedTypes": ["HUMAN_CANDIDATE", "AI_AGENT", "VENDOR_ENTITY"],
+    "identifierMapping": {
+      "primaryKey": "entity_id",
+      "externalSystemRef": "source_system_code"
+    }
+  },
+
+  "evaluationMatrix": {
+    "$comment": "Weights must sum to 1.0",
+    "dimensions": [
+      {
+        "code": "DIM_CORE_EFFICIENCY",
+        "name": { "en": "Efficiency & Speed", "fr": "Efficacité et rapidité" },
+        "weight": 0.40,
+        "description": { "en": "Output per unit of time (task speed or AI latency)", "fr": "Production par unité de temps" }
+      },
+      {
+        "code": "DIM_QUALITY_ACCURACY",
+        "name": { "en": "Accuracy & Quality", "fr": "Exactitude et qualité" },
+        "weight": 0.60,
+        "description": { "en": "Correctness of output (skill or error rate)", "fr": "Exactitude du résultat" }
+      }
+    ]
+  },
+
+  "dataIngestion": {
+    "channels": [
+      {
+        "channelId": "ch_manual_ui",
+        "type": "DYNAMIC_FORM",
+        "enabled": true,
+        "fields": [
+          {
+            "fieldCode": "input_manager_score",
+            "label": { "en": "Manager rating", "fr": "Évaluation du gestionnaire" },
+            "type": "NUMBER_SLIDER",
+            "min": 1,
+            "max": 10,
+            "bindToDimension": "DIM_QUALITY_ACCURACY"
+          }
+        ]
+      },
+      {
+        "channelId": "ch_automated_telemetry",
+        "type": "WEBHOOK_PAYLOAD",
+        "enabled": true,
+        "validationSchema": {
+          "type": "object",
+          "properties": {
+            "execution_latency_ms": { "type": "number", "minimum": 0 },
+            "error_rate_percentage": { "type": "number", "minimum": 0, "maximum": 100 }
+          },
+          "required": ["execution_latency_ms"]
+        }
+      }
+    ]
+  },
+
+  "calculationEngine": {
+    "$comment": "matrix_config arrives as {'DIM_X': {'weight': .., 'name': ..}}",
+    "runtime": "PYTHON_3_11",
+    "entrypoint": "calculate_scores",
+    "timeoutMs": 2000,
+    "memoryLimitMb": 128,
+    "script": "def calculate_scores(ingested_data, matrix_config):\n    latency = ingested_data.get('execution_latency_ms', 500)\n    error_rate = ingested_data.get('error_rate_percentage', 0)\n    manual_rating = ingested_data.get('input_manager_score', 5) * 10\n\n    if latency < 200:\n        efficiency_score = 100\n    elif latency < 1000:\n        efficiency_score = 80\n    else:\n        efficiency_score = 40\n\n    quality_score = max(0, min(100, manual_rating - (error_rate * 2)))\n\n    w_eff = matrix_config['DIM_CORE_EFFICIENCY']['weight']\n    w_qua = matrix_config['DIM_QUALITY_ACCURACY']['weight']\n\n    final_composite_score = (efficiency_score * w_eff) + (quality_score * w_qua)\n\n    return {\n        'compositeScore': round(final_composite_score, 2),\n        'breakdown': {\n            'DIM_CORE_EFFICIENCY': efficiency_score,\n            'DIM_QUALITY_ACCURACY': quality_score\n        }\n    }\n"
+  },
+
+  "outputConfiguration": {
+    "generateReport": true,
+    "visualization": {
+      "defaultView": "RADAR_CHART",
+      "colorPalette": "DEFAULT",
+      "thresholds": { "critical": 60, "excellent": 90 }
+    }
+  },
+
+  "compliance": {
+    "jurisdictions": ["CA-ON", "CA-BC", "CA-QC"],
+    "dataResidency": "CA",
+    "purpose": {
+      "en": "Assess job-related skills of candidates who applied for an open position.",
+      "fr": "Évaluer les compétences liées à l'emploi des candidats ayant postulé à un poste."
+    },
+    "retentionDays": 365,
+    "consentRequired": true,
+    "automatedDecision": {
+      "humanReviewRequired": true,
+      "disclosureNotice": {
+        "en": "An automated system helped score this assessment. A person reviews every result, and you may ask for the information used and for a human review.",
+        "fr": "Un système automatisé a contribué à noter cette évaluation. Une personne révise chaque résultat, et vous pouvez demander les renseignements utilisés et une révision humaine."
+      }
+    },
+    "personalDataFields": ["input_manager_score"]
+  }
+}

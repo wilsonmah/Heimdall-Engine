@@ -1,0 +1,9 @@
+{
+  "targetType": "AI_AGENT",
+  "entity_id": "agent-support-bot-07",
+  "source_system_code": "MLOPS",
+  "channels": {
+    "ch_automated_telemetry": { "execution_latency_ms": 150, "error_rate_percentage": 3.5 },
+    "ch_manual_ui": { "input_manager_score": 9 }
+  }
+}
